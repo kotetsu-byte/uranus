@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Uranus.Dto;
+using Uranus.Exceptions;
 using Uranus.Interfaces;
 using Uranus.Models;
 using Uranus.Repository;
@@ -26,9 +27,6 @@ namespace Uranus.Controllers
         {
             var homework = _mapper.Map<List<HomeworkDto>>(_homeworkRepository.GetHomeworks());
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             return Ok(homework);
         }
 
@@ -37,15 +35,15 @@ namespace Uranus.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetHomeworkById(int id)
         {
-            if (!_homeworkRepository.HomeworkExists(id))
-                return NotFound();
-
             var homework = _mapper.Map<HomeworkDto>(_homeworkRepository.GetHomeworkById(id));
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return Ok(homework);
+            
+            try
+            {
+                return Ok(homework);
+            } catch(NotFoundException ex)
+            {
+                return NotFound();
+            }
         }
 
         [HttpGet("{id}/materials")]
@@ -55,10 +53,13 @@ namespace Uranus.Controllers
         {
             var materials = _mapper.Map<HomeworkDto>(_homeworkRepository.GetMaterials(id));
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return Ok(materials);
+            try
+            {
+                return Ok(materials);
+            } catch(NotFoundException ex)
+            {
+                return NotFound();
+            }
         }
 
         [HttpPost]
@@ -66,30 +67,9 @@ namespace Uranus.Controllers
         [ProducesResponseType(400)]
         public IActionResult CreateLesson([FromBody] HomeworkDto homeworkCreate)
         {
-            if (homeworkCreate == null)
-                return BadRequest(ModelState);
-
-            var user = _homeworkRepository.GetHomeworks()
-                .Where(u => u.Id == homeworkCreate.Id)
-                .FirstOrDefault();
-
-            if (user != null)
-            {
-                ModelState.AddModelError("", "Lesson already exists");
-                return StatusCode(422, ModelState);
-            }
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var homeworkMap = _mapper.Map<Homework>(homeworkCreate);
 
-            if (!_homeworkRepository.CreateHomework(homeworkMap))
-            {
-                ModelState.AddModelError("", "Something went wrong while saving homework");
-                return StatusCode(500, ModelState);
-            }
-
+            _homeworkRepository.CreateHomework(homeworkMap);
             return Ok("Successfully created");
         }
 
@@ -99,25 +79,9 @@ namespace Uranus.Controllers
         [ProducesResponseType(404)]
         public IActionResult UpdateHomework(int homeworkId, [FromBody] Homework updatedHomework)
         {
-            if (updatedHomework == null)
-                return BadRequest(ModelState);
-
-            if (homeworkId != updatedHomework.Id)
-                return BadRequest(ModelState);
-
-            if (!_homeworkRepository.HomeworkExists(homeworkId))
-                return NotFound();
-
-            if (!ModelState.IsValid)
-                return BadRequest();
-
             var homeworkMap = _mapper.Map<Homework>(updatedHomework);
 
-            if (!_homeworkRepository.UpdateHomework(homeworkMap))
-            {
-                ModelState.AddModelError("", "Something went wrong while upading lesson");
-                return StatusCode(500, ModelState);
-            }
+            _homeworkRepository.UpdateHomework(homeworkMap);
 
             return NoContent();
         }
@@ -128,16 +92,9 @@ namespace Uranus.Controllers
         [ProducesResponseType(404)]
         public IActionResult DeleteHomework(int id)
         {
-            if (!_homeworkRepository.HomeworkExists(id))
-                return NotFound();
-
             var homeworkToDelete = _homeworkRepository.GetHomeworkById(id);
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            if (!_homeworkRepository.DeleteHomework(homeworkToDelete))
-                ModelState.AddModelError("", "Something went wrong deleting homework");
+            _homeworkRepository.DeleteHomework(homeworkToDelete);
 
             return NoContent();
         }

@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Uranus.Dto;
+using Uranus.Exceptions;
 using Uranus.Interfaces;
 using Uranus.Models;
 
@@ -22,12 +24,7 @@ namespace Uranus.Controllers
         [ProducesResponseType(200, Type = typeof(IEnumerable<User>))]
         public IActionResult GetUsers()
         {
-            var user = _mapper.Map<List<UserDto>>(_userRepository.GetUsers());
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return Ok(user);
+            return Ok(_mapper.Map<List<UserDto>>(_userRepository.GetUsers()));
         }
 
         [HttpGet("{id}")]
@@ -35,15 +32,13 @@ namespace Uranus.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetUserById(int id)
         {
-            if (!_userRepository.UserExists(id))
+            try
+            {
+                return Ok(_mapper.Map<UserDto>(_userRepository.GetUserById(id)));
+            } catch (NotFoundException ex) 
+            {
                 return NotFound();
-
-            var user = _mapper.Map<UserDto>(_userRepository.GetUserById(id));
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return Ok(user);
+            }
         }
 
         [HttpPost]
@@ -51,29 +46,9 @@ namespace Uranus.Controllers
         [ProducesResponseType(400)]
         public IActionResult CreateUser([FromBody] User userCreate)
         {
-            if (userCreate == null)
-                return BadRequest(ModelState);
-
-            var user = _userRepository.GetUsers()
-                .Where(u => u.Id == userCreate.Id)
-                .FirstOrDefault();
-
-            if (user != null)
-            {
-                ModelState.AddModelError("", "User already exists");
-                return StatusCode(422, ModelState);
-            }
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var userMap = _mapper.Map<User>(userCreate);
 
-            if (!_userRepository.CreateUser(userMap))
-            {
-                ModelState.AddModelError("", "Something went wrong while saving user");
-                return StatusCode(500, ModelState);
-            }
+            _userRepository.CreateUser(userMap);
 
             return Ok("Successfully created");
         }
@@ -82,28 +57,12 @@ namespace Uranus.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public IActionResult UpdateUser(int userId, [FromBody] UserDto updatedUser)
+        public IActionResult UpdateUser([FromBody] UserDto updatedUser)
         {
-            if (updatedUser == null)
-                return BadRequest(ModelState);
-
-            if (userId != updatedUser.Id)
-                return BadRequest(ModelState);
-
-            if (!_userRepository.UserExists(userId))
-                return NotFound();
-
-            if (!ModelState.IsValid)
-                return BadRequest();
-
             var userMap = _mapper.Map<User>(updatedUser);
 
-            if (!_userRepository.UpdateUser(userMap))
-            {
-                ModelState.AddModelError("", "Something went wrong while updating user");
-                return StatusCode(500, ModelState);
-            }
-
+            _userRepository.UpdateUser(userMap);
+            
             return NoContent();
         }
 
@@ -113,16 +72,9 @@ namespace Uranus.Controllers
         [ProducesResponseType(404)]
         public IActionResult DeleteUser(int id)
         {
-            if (!_userRepository.UserExists(id))
-                return NotFound();
-
             var userToDelete = _userRepository.GetUserById(id);
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            if (!_userRepository.DeleteUser(userToDelete))
-                ModelState.AddModelError("", "Something went wrong deleting user");
+            _userRepository.DeleteUser(userToDelete);
 
             return NoContent();
         }

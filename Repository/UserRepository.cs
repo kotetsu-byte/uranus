@@ -1,4 +1,6 @@
-﻿using Uranus.Data;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Uranus.Data;
+using Uranus.Exceptions;
 using Uranus.Interfaces;
 using Uranus.Models;
 
@@ -14,23 +16,40 @@ namespace Uranus.Repository
 
         public ICollection<User> GetUsers()
         {
-
             return _context.Users.OrderBy(p => p.Id).ToList();
         }
 
         public User GetUserById(int id)
         {
-            return _context.Users.Where(p => p.Id == id).FirstOrDefault();
+            try
+            {
+                return _context.Users.Where(p => p.Id == id).First();
+            } catch(Exception ex)
+            {
+                throw new NotFoundException();
+            }
         }
 
-        public User GetUserByLogin(string login)
+        public User GetUserByUsername(string username)
         {
-            return _context.Users.Where(p => p.Login == login).FirstOrDefault();
+            try
+            {
+                return _context.Users.Where(p => p.Username == username).First();
+            } catch(Exception) 
+            {
+                throw new NotFoundException();
+            }
         }
 
         public User GetUserByEmail(string email)
         {
-            return _context.Users.Where(p => p.Email == email).FirstOrDefault();
+            try
+            {
+                return _context.Users.Where(p => p.Email == email).First();
+            } catch(Exception ex) 
+            {
+                throw new NotFoundException();
+            }
         }
 
         public bool UserExists(int id)
@@ -40,6 +59,9 @@ namespace Uranus.Repository
 
         public bool CreateUser(User user)
         {
+            if (!UserExists(user.Id))
+                throw new NotFoundException();
+            
             _context.Add(user);
 
             return Save();
@@ -47,6 +69,9 @@ namespace Uranus.Repository
 
         public bool UpdateUser(User user)
         {
+            if (!UserExists(user.Id))
+                throw new NotFoundException();
+
             _context.Update(user);
 
             return Save();
@@ -54,6 +79,9 @@ namespace Uranus.Repository
 
         public bool DeleteUser(User user)
         {
+            if (!UserExists(user.Id))
+                throw new NotFoundException();
+
             _context.Remove(user);
 
             return Save();

@@ -1,4 +1,5 @@
 ﻿using Uranus.Data;
+using Uranus.Exceptions;
 using Uranus.Interfaces;
 using Uranus.Models;
 
@@ -20,7 +21,13 @@ namespace Uranus.Repository
 
         public Lesson GetLessonById(int id)
         {
-            return _context.Lessons.Where(l => l.Id == id).FirstOrDefault();
+            try
+            {
+                return _context.Lessons.Where(l => l.Id == id).First();
+            } catch(Exception ex)
+            {
+                throw new NotFoundException();
+            }
         }
 
         public bool LessonExists(int id)
@@ -30,20 +37,35 @@ namespace Uranus.Repository
 
         public string[] GetVideos(int id)
         {
-            var lesson = _context.Lessons.Where(c => c.Id == id).FirstOrDefault();
+            var lesson = _context.Lessons.Where(c => c.Id == id).First();
 
-            return lesson.Videos;
+            try
+            {
+                return lesson.Videos;
+            } catch(Exception ex)
+            {
+                throw new NotFoundException();
+            }
         }
 
         public string[] GetDocs(int id)
         {
-            var lesson = _context.Lessons.Where(c => c.Id == id).FirstOrDefault();
+            var lesson = _context.Lessons.Where(c => c.Id == id).First();
 
-            return lesson.Docs;
+            try
+            {
+                return lesson.Docs;
+            } catch(Exception ex)
+            {
+                throw new NotFoundException();
+            }
         }
 
         public bool CreateLesson(Lesson lesson)
         {
+            if (!LessonExists(lesson.Id))
+                throw new NotFoundException();
+            
             _context.Lessons.Add(lesson);
 
             return Save();
@@ -51,6 +73,9 @@ namespace Uranus.Repository
 
         public bool UpdateLesson(Lesson lesson)
         {
+            if (!LessonExists(lesson.Id))
+                throw new NotFoundException();
+
             _context.Update(lesson);
 
             return Save();
@@ -58,6 +83,9 @@ namespace Uranus.Repository
 
         public bool DeleteLesson(Lesson lesson)
         {
+            if (!LessonExists(lesson.Id))
+                throw new NotFoundException();
+
             _context.Remove(lesson);
 
             return Save();

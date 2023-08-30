@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Uranus.Dto;
+using Uranus.Exceptions;
 using Uranus.Interfaces;
 using Uranus.Models;
 using Uranus.Repository;
@@ -26,9 +27,6 @@ namespace Uranus.Controllers
         {
             var lesson = _mapper.Map<List<LessonDto>>(_lessonRepository.GetLessons());
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             return Ok(lesson);
         }
 
@@ -37,15 +35,15 @@ namespace Uranus.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetLessonById(int id)
         {
-            if (!_lessonRepository.LessonExists(id))
-                return NotFound();
-
             var lesson = _mapper.Map<LessonDto>(_lessonRepository.GetLessonById(id));
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return Ok(lesson);
+            try
+            {
+                return Ok(lesson);
+            } catch(NotFoundException ex)
+            {
+                return NotFound();
+            }
         }
 
         [HttpGet("{id}/videos")]
@@ -55,10 +53,13 @@ namespace Uranus.Controllers
         {
             var videos = _mapper.Map<LessonDto>(_lessonRepository.GetVideos(id));
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return Ok(videos);
+            try
+            {
+                return Ok(videos);
+            } catch(NotFoundException ex)
+            {
+                return NotFound();
+            }
         }
 
         [HttpGet("{id}/docs")]
@@ -68,10 +69,13 @@ namespace Uranus.Controllers
         {
             var docs = _mapper.Map<LessonDto>(_lessonRepository.GetDocs(id));
 
-            if (!ModelState.IsValid)
-                return BadRequest();
-
-            return Ok(docs);
+            try
+            {
+                return Ok(docs);
+            } catch(NotFoundException ex) 
+            {
+                return NotFound();
+            }
         }
 
         [HttpPost]
@@ -79,31 +83,10 @@ namespace Uranus.Controllers
         [ProducesResponseType(400)]
         public IActionResult CreateLesson([FromBody] LessonDto lessonCreate)
         {
-
-            if (lessonCreate == null)
-                return BadRequest(ModelState);
-
-            var user = _lessonRepository.GetLessons()
-                .Where(u => u.Id == lessonCreate.Id)
-                .FirstOrDefault();
-
-            if (user != null)
-            {
-                ModelState.AddModelError("", "Lesson already exists");
-                return StatusCode(422, ModelState);
-            }
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var lessonMap = _mapper.Map<Lesson>(lessonCreate);
 
-            if (!_lessonRepository.CreateLesson(lessonMap))
-            {
-                ModelState.AddModelError("", "Something went wrong while saving lesson");
-                return StatusCode(500, ModelState);
-            }
-
+            _lessonRepository.CreateLesson(lessonMap);
+            
             return Ok("Successfully created");
         }
 
@@ -113,25 +96,9 @@ namespace Uranus.Controllers
         [ProducesResponseType(404)]
         public IActionResult UpdateLesson(int lessonId, [FromBody] LessonDto updatedLesson)
         {
-            if (updatedLesson == null)
-                return BadRequest(ModelState);
-
-            if (lessonId != updatedLesson.Id)
-                return BadRequest(ModelState);
-
-            if (!_lessonRepository.LessonExists(lessonId))
-                return NotFound();
-
-            if (!ModelState.IsValid)
-                return BadRequest();
-
             var lessonMap = _mapper.Map<Lesson>(updatedLesson);
 
-            if (!_lessonRepository.UpdateLesson(lessonMap))
-            {
-                ModelState.AddModelError("", "Something went wrong while updating lesson");
-                return StatusCode(500, ModelState);
-            }
+            _lessonRepository.UpdateLesson(lessonMap);
 
             return NoContent();
         }
@@ -142,16 +109,9 @@ namespace Uranus.Controllers
         [ProducesResponseType(404)]
         public IActionResult DeleteLesson(int id)
         {
-            if (!_lessonRepository.LessonExists(id))
-                return NotFound();
-
             var lessonToDelete = _lessonRepository.GetLessonById(id);
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            if (!_lessonRepository.DeleteLesson(lessonToDelete))
-                ModelState.AddModelError("", "Something went wrong deleting lesson");
+            _lessonRepository.DeleteLesson(lessonToDelete);
 
             return NoContent();
         }

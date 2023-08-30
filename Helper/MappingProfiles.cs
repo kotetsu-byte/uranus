@@ -16,6 +16,8 @@ namespace Uranus.Helper
             CreateMap<LessonDto, Lesson>();
             CreateMap<Homework, HomeworkDto>();
             CreateMap<HomeworkDto, Homework>();
+            CreateMap<Login, LoginDto>();
+            CreateMap<LoginDto, Login>();
         }
     }
 }

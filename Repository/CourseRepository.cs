@@ -1,4 +1,5 @@
 ﻿using Uranus.Data;
+using Uranus.Exceptions;
 using Uranus.Interfaces;
 using Uranus.Models;
 
@@ -15,17 +16,30 @@ namespace Uranus.Repository
 
         public ICollection<Course> GetCourses()
         {
+            
             return _context.Courses.OrderBy(c => c.Id).ToList();
         }
 
         public Course GetCourseById(int id)
         {
-            return _context.Courses.Where(c => c.Id == id).FirstOrDefault();
+            try
+            {
+                return _context.Courses.Where(c => c.Id == id).First();
+            } catch(Exception ex)
+            {
+                throw new NotFoundException();
+            }
         }
 
         public Course GetCourseByName(string name)
         {
-            return _context.Courses.Where(c => c.Name == name).FirstOrDefault();
+            try
+            {
+                return _context.Courses.Where(c => c.Name == name).First();
+            } catch(Exception ex)
+            {
+                throw new NotFoundException();
+            }
         }
 
         public bool CourseExists(int id)
@@ -35,13 +49,23 @@ namespace Uranus.Repository
 
         public string[] GetTests(int id)
         {
-            var course = _context.Courses.Where(c => c.Id == id).FirstOrDefault();
+            try
+            {
+                var course = _context.Courses.Where(c => c.Id == id).First();
 
-            return course.Tests;
+                return course.Tests;
+            }
+            catch (Exception ex)
+            {
+                throw new NotFoundException();
+            }
         }
 
         public bool CreateCourse(Course course)
         {
+            if (!CourseExists(course.Id))
+                throw new NotFoundException();
+
             _context.Add(course);
 
             return Save();
@@ -49,6 +73,9 @@ namespace Uranus.Repository
 
         public bool UpdateCourse(Course course)
         {
+            if (!CourseExists(course.Id))
+                throw new NotFoundException();
+
             _context.Update(course);
 
             return Save();
@@ -56,6 +83,9 @@ namespace Uranus.Repository
 
         public bool DeleteCourse(Course course)
         {
+            if (!CourseExists(course.Id))
+                throw new NotFoundException();
+
             _context.Remove(course);
 
             return Save();

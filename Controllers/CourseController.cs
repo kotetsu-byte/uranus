@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Uranus.Dto;
+using Uranus.Exceptions;
 using Uranus.Interfaces;
 using Uranus.Models;
 using Uranus.Repository;
@@ -26,9 +27,6 @@ namespace Uranus.Controllers
         {
             var course = _mapper.Map<List<CourseDto>>(_courseRepository.GetCourses());
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             return Ok(course);
         }
 
@@ -37,15 +35,14 @@ namespace Uranus.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetCourseById(int id)
         {
-            if (!_courseRepository.CourseExists(id))
-                return NotFound();
-
             var course = _mapper.Map<CourseDto>(_courseRepository.GetCourseById(id));
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return Ok(course);
+            try
+            {
+                return Ok(course);
+            }catch(NotFoundException ex)
+            {
+                return NotFound();
+            }
         }
 
         [HttpGet("{id}/tests")]
@@ -53,12 +50,15 @@ namespace Uranus.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetTests(int id)
         {
-            var tests = _mapper.Map<CourseDto>(_courseRepository.GetTests(id));
+            try
+            {
+                var tests = _mapper.Map<CourseDto>(_courseRepository.GetTests(id));
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return Ok(tests);
+                return Ok(tests);
+            }catch (NotFoundException ex) 
+            {
+                return NotFound();
+            }
         }
 
         [HttpPost]
@@ -66,29 +66,9 @@ namespace Uranus.Controllers
         [ProducesResponseType(400)]
         public IActionResult CreateCourse([FromBody] CourseDto courseCreate)
         {
-            if (courseCreate == null)
-                return BadRequest(ModelState);
-
-            var user = _courseRepository.GetCourses()
-                .Where(u => u.Id == courseCreate.Id)
-                .FirstOrDefault();
-
-            if (user != null)
-            {
-                ModelState.AddModelError("", "Course already exists");
-                return StatusCode(422, ModelState);
-            }
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var courseMap = _mapper.Map<Course>(courseCreate);
 
-            if (!_courseRepository.CreateCourse(courseMap))
-            {
-                ModelState.AddModelError("", "Something went wrong while saving course");
-                return StatusCode(500, ModelState);
-            }
+            _courseRepository.CreateCourse(courseMap);
 
             return Ok("Successfully created");
         }
@@ -99,25 +79,9 @@ namespace Uranus.Controllers
         [ProducesResponseType(404)]
         public IActionResult UpdateCourse(int courseId, [FromBody] UserDto updatedCourse)
         {
-            if (updatedCourse == null)
-                return BadRequest(ModelState);
-
-            if (courseId != updatedCourse.Id)
-                return BadRequest(ModelState);
-
-            if (!_courseRepository.CourseExists(courseId))
-                return NotFound();
-
-            if (!ModelState.IsValid)
-                return BadRequest();
-
             var courseMap = _mapper.Map<Course>(updatedCourse);
 
-            if (!_courseRepository.UpdateCourse(courseMap))
-            {
-                ModelState.AddModelError("", "Something went wrong while updating course");
-                return StatusCode(500, ModelState);
-            }
+            _courseRepository.UpdateCourse(courseMap);
 
             return NoContent();
         }
@@ -128,17 +92,10 @@ namespace Uranus.Controllers
         [ProducesResponseType(404)]
         public IActionResult DeleteCourse(int id)
         {
-            if (!_courseRepository.CourseExists(id))
-                return NotFound();
-
             var courseToDelete = _courseRepository.GetCourseById(id);
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            if (!_courseRepository.DeleteCourse(courseToDelete))
-                ModelState.AddModelError("", "Something went wrong deleting course");
-
+            _courseRepository.DeleteCourse(courseToDelete);
+            
             return NoContent();
         }
     }

@@ -6,7 +6,7 @@ namespace Uranus.Interfaces
     {
         public ICollection<User> GetUsers();
         public User GetUserById(int id);
-        public User GetUserByLogin(string login);
+        public User GetUserByUsername(string username);
         public User GetUserByEmail(string email);
         public bool UserExists(int id);
         public bool CreateUser(User user);

@@ -1,4 +1,5 @@
 ﻿using Uranus.Data;
+using Uranus.Exceptions;
 using Uranus.Interfaces;
 using Uranus.Models;
 
@@ -20,12 +21,24 @@ namespace Uranus.Repository
 
         public Homework GetHomeworkById(int id)
         {
-            return _context.Homeworks.Where(l => l.Id == id).FirstOrDefault();
+            try
+            {
+                return _context.Homeworks.Where(l => l.Id == id).First();
+            } catch(Exception ex)
+            {
+                throw new NotFoundException();
+            }
         }
 
         public Homework GetHomeworkByTitle(string title)
         {
-            return _context.Homeworks.Where(l => l.Title == title).FirstOrDefault();
+            try
+            {
+                return _context.Homeworks.Where(l => l.Title == title).First();
+            } catch(Exception ex)
+            {
+                throw new NotFoundException();
+            }
         }
 
         public bool HomeworkExists(int id)
@@ -35,13 +48,22 @@ namespace Uranus.Repository
 
         public string[] GetMaterials(int id)
         {
-            var homework = _context.Homeworks.Where(h => h.Id == id).FirstOrDefault();
+            var homework = _context.Homeworks.Where(h => h.Id == id).First();
 
-            return homework.Materials;
+            try
+            {
+                return homework.Materials;
+            } catch(Exception ex)
+            {
+                throw new NotFoundException();
+            }
         }
 
         public bool CreateHomework(Homework homework)
         {
+            if (!HomeworkExists(homework.Id))
+                throw new NotFoundException();
+            
             _context.Homeworks.Add(homework);
 
             return Save();
@@ -49,6 +71,9 @@ namespace Uranus.Repository
 
         public bool UpdateHomework(Homework homework)
         {
+            if (!HomeworkExists(homework.Id))
+                throw new NotFoundException();
+
             _context.Update(homework);
 
             return Save();
@@ -56,6 +81,9 @@ namespace Uranus.Repository
 
         public bool DeleteHomework(Homework homework)
         {
+            if (!HomeworkExists(homework.Id))
+                throw new NotFoundException();
+
             _context.Remove(homework);
 
             return Save();
