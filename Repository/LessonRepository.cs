@@ -42,14 +42,8 @@ namespace Uranus.Repository
             return lesson.Docs;
         }
 
-        public bool CreateLesson(Lesson lesson, int courseId, string info, string[] videos, string[] docs)
+        public bool CreateLesson(Lesson lesson)
         {
-
-            lesson.Info = info;
-            lesson.Videos = videos;
-            lesson.Docs = docs;
-            lesson.Course.Id = courseId;
-
             _context.Lessons.Add(lesson);
 
             return Save();

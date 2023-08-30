@@ -28,7 +28,7 @@ namespace Uranus.Repository
             return _context.Courses.Where(c => c.Name == name).FirstOrDefault();
         }
 
-        public bool CourseExists(int id) 
+        public bool CourseExists(int id)
         {
             return _context.Courses.Any(c => c.Id == id);
         }
@@ -40,13 +40,8 @@ namespace Uranus.Repository
             return course.Tests;
         }
 
-        public bool CreateCourse(Course course, string name, string description, double price, string[] tests)
+        public bool CreateCourse(Course course)
         {
-            course.Name = name;
-            course.Description = description;
-            course.Price = price;
-            course.Tests = tests;
-
             _context.Add(course);
 
             return Save();
@@ -59,7 +54,7 @@ namespace Uranus.Repository
             return Save();
         }
 
-        public bool DeleteCourse(Course course) 
+        public bool DeleteCourse(Course course)
         {
             _context.Remove(course);
 

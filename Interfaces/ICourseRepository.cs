@@ -9,7 +9,7 @@ namespace Uranus.Interfaces
         public Course GetCourseByName(string courseName);
         public bool CourseExists(int id);
         public string[] GetTests(int id);
-        public bool CreateCourse(Course course, string name, string description, double price, string[] tests);
+        public bool CreateCourse(Course course);
         public bool UpdateCourse(Course course);
         public bool DeleteCourse(Course course);
         public bool Save();

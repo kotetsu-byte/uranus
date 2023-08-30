@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using Uranus.Dto;
 using Uranus.Interfaces;
 using Uranus.Models;
 
@@ -9,18 +11,20 @@ namespace Uranus.Controllers
     public class UserController : Controller
     {
         private readonly IUserRepository _userRepository;
-        public UserController(IUserRepository userRepository)
+        private readonly IMapper _mapper;
+        public UserController(IUserRepository userRepository, IMapper mapper)
         {
             _userRepository = userRepository;
+            _mapper = mapper;
         }
 
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<User>))]
         public IActionResult GetUsers()
         {
-            var user = _userRepository.GetUsers();
+            var user = _mapper.Map<List<UserDto>>(_userRepository.GetUsers());
 
-            if(!ModelState.IsValid) 
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             return Ok(user);
@@ -29,12 +33,13 @@ namespace Uranus.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(200, Type = typeof(User))]
         [ProducesResponseType(400)]
-        public IActionResult GetUserById(int id) {
+        public IActionResult GetUserById(int id)
+        {
             if (!_userRepository.UserExists(id))
                 return NotFound();
 
-            var user = _userRepository.GetUserById(id);
-            
+            var user = _mapper.Map<List<UserDto>>(_userRepository.GetUserById(id));
+
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -44,23 +49,31 @@ namespace Uranus.Controllers
         [HttpPost]
         [ProducesResponseType(204, Type = typeof(bool))]
         [ProducesResponseType(400)]
-        public IActionResult CreateUser([FromBody] User userCreate) 
-        { 
-            if(userCreate == null)
+        public IActionResult CreateUser([FromBody] User userCreate)
+        {
+            if (userCreate == null)
                 return BadRequest(ModelState);
 
             var user = _userRepository.GetUsers()
                 .Where(u => u.Id == userCreate.Id)
                 .FirstOrDefault();
 
-            if(user != null)
+            if (user != null)
             {
                 ModelState.AddModelError("", "User already exists");
                 return StatusCode(422, ModelState);
             }
 
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            var userMap = _mapper.Map<User>(userCreate);
+
+            if (!_userRepository.CreateUser(userMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while saving user");
+                return StatusCode(500, ModelState);
+            }
 
             return Ok("Successfully created");
         }
@@ -69,12 +82,12 @@ namespace Uranus.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public IActionResult UpdateUser(int userId, [FromBody] User updatedUser) 
+        public IActionResult UpdateUser(int userId, [FromBody] UserDto updatedUser)
         {
-            if(updatedUser == null)
+            if (updatedUser == null)
                 return BadRequest(ModelState);
 
-            if(userId != updatedUser.Id)
+            if (userId != updatedUser.Id)
                 return BadRequest(ModelState);
 
             if (!_userRepository.UserExists(userId))
@@ -82,6 +95,14 @@ namespace Uranus.Controllers
 
             if (!ModelState.IsValid)
                 return BadRequest();
+
+            var userMap = _mapper.Map<User>(updatedUser);
+
+            if (!_userRepository.UpdateUser(userMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while updating user");
+                return StatusCode(500, ModelState);
+            }
 
             return NoContent();
         }

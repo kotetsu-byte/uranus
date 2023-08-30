@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using Uranus.Dto;
 using Uranus.Interfaces;
 using Uranus.Models;
 using Uranus.Repository;
@@ -9,20 +11,22 @@ namespace Uranus.Controllers
     [ApiController]
     public class LessonController : Controller
     {
-        private ILessonRepository _lessonRepository;
+        private readonly ILessonRepository _lessonRepository;
+        private readonly IMapper _mapper;
 
-        public LessonController(ILessonRepository lessonRepository)
+        public LessonController(ILessonRepository lessonRepository, IMapper mapper)
         {
             _lessonRepository = lessonRepository;
+            _mapper = mapper;
         }
 
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Lesson>))]
         public IActionResult GetLessons()
         {
-            var lesson = _lessonRepository.GetLessons();
+            var lesson = _mapper.Map<List<LessonDto>>(_lessonRepository.GetLessons());
 
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             return Ok(lesson);
@@ -36,9 +40,9 @@ namespace Uranus.Controllers
             if (!_lessonRepository.LessonExists(id))
                 return NotFound();
 
-            var lesson = _lessonRepository.GetLessonById(id);
+            var lesson = _mapper.Map<List<LessonDto>>(_lessonRepository.GetLessonById(id));
 
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             return Ok(lesson);
@@ -49,7 +53,7 @@ namespace Uranus.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetVideos(int id)
         {
-            var videos = _lessonRepository.GetVideos(id);
+            var videos = _mapper.Map<List<LessonDto>>(_lessonRepository.GetVideos(id));
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -62,20 +66,20 @@ namespace Uranus.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetDocs(int id)
         {
-            var docs = _lessonRepository.GetDocs(id);
-            
-            if(!ModelState.IsValid)
+            var docs = _mapper.Map<List<LessonDto>>(_lessonRepository.GetDocs(id));
+
+            if (!ModelState.IsValid)
                 return BadRequest();
-        
+
             return Ok(docs);
         }
 
         [HttpPost]
         [ProducesResponseType(204, Type = typeof(bool))]
         [ProducesResponseType(400)]
-        public IActionResult CreateLesson([FromBody] Lesson lessonCreate)
+        public IActionResult CreateLesson([FromBody] LessonDto lessonCreate)
         {
-            
+
             if (lessonCreate == null)
                 return BadRequest(ModelState);
 
@@ -92,6 +96,14 @@ namespace Uranus.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            var lessonMap = _mapper.Map<Lesson>(lessonCreate);
+
+            if (!_lessonRepository.CreateLesson(lessonMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while saving lesson");
+                return StatusCode(500, ModelState);
+            }
+
             return Ok("Successfully created");
         }
 
@@ -99,7 +111,7 @@ namespace Uranus.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public IActionResult UpdateLesson(int lessonId, [FromBody] Lesson updatedLesson)
+        public IActionResult UpdateLesson(int lessonId, [FromBody] LessonDto updatedLesson)
         {
             if (updatedLesson == null)
                 return BadRequest(ModelState);
@@ -112,6 +124,14 @@ namespace Uranus.Controllers
 
             if (!ModelState.IsValid)
                 return BadRequest();
+
+            var lessonMap = _mapper.Map<Lesson>(updatedLesson);
+
+            if (!_lessonRepository.UpdateLesson(lessonMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while updating lesson");
+                return StatusCode(500, ModelState);
+            }
 
             return NoContent();
         }

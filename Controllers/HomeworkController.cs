@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using Uranus.Dto;
 using Uranus.Interfaces;
 using Uranus.Models;
 using Uranus.Repository;
@@ -10,17 +12,19 @@ namespace Uranus.Controllers
     public class HomeworkController : Controller
     {
         private readonly IHomeworkRepository _homeworkRepository;
+        private readonly IMapper _mapper;
 
-        public HomeworkController(IHomeworkRepository homeworkRepository)
+        public HomeworkController(IHomeworkRepository homeworkRepository, IMapper mapper)
         {
             _homeworkRepository = homeworkRepository;
+            _mapper = mapper;
         }
 
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Homework>))]
         public IActionResult GetHomework()
         {
-            var homework = _homeworkRepository.GetHomeworks();
+            var homework = _mapper.Map<List<HomeworkDto>>(_homeworkRepository.GetHomeworks());
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -36,7 +40,7 @@ namespace Uranus.Controllers
             if (!_homeworkRepository.HomeworkExists(id))
                 return NotFound();
 
-            var homework = _homeworkRepository.GetHomeworkById(id);
+            var homework = _mapper.Map<List<HomeworkDto>>(_homeworkRepository.GetHomeworkById(id));
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -49,18 +53,18 @@ namespace Uranus.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetMaterials(int id)
         {
-            var materials = _homeworkRepository.GetMaterials(id);
+            var materials = _mapper.Map<List<HomeworkDto>>(_homeworkRepository.GetMaterials(id));
 
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            
+
             return Ok(materials);
         }
 
         [HttpPost]
         [ProducesResponseType(204, Type = typeof(bool))]
         [ProducesResponseType(400)]
-        public IActionResult CreateLesson([FromBody] Homework homeworkCreate)
+        public IActionResult CreateLesson([FromBody] HomeworkDto homeworkCreate)
         {
             if (homeworkCreate == null)
                 return BadRequest(ModelState);
@@ -77,6 +81,14 @@ namespace Uranus.Controllers
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            var homeworkMap = _mapper.Map<Homework>(homeworkCreate);
+
+            if (!_homeworkRepository.CreateHomework(homeworkMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while saving homework");
+                return StatusCode(500, ModelState);
+            }
 
             return Ok("Successfully created");
         }
@@ -98,6 +110,14 @@ namespace Uranus.Controllers
 
             if (!ModelState.IsValid)
                 return BadRequest();
+
+            var homeworkMap = _mapper.Map<Homework>(updatedHomework);
+
+            if (!_homeworkRepository.UpdateHomework(homeworkMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while upading lesson");
+                return StatusCode(500, ModelState);
+            }
 
             return NoContent();
         }

@@ -9,7 +9,7 @@ namespace Uranus.Interfaces
         public User GetUserByLogin(string login);
         public User GetUserByEmail(string email);
         public bool UserExists(int id);
-        public bool CreateUser(User user, string login, string email, string password);
+        public bool CreateUser(User user);
         public bool UpdateUser(User user);
         public bool DeleteUser(User user);
         public bool Save();

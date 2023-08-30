@@ -25,7 +25,7 @@ namespace Uranus.Repository
 
         public Homework GetHomeworkByTitle(string title)
         {
-            return _context.Homeworks.Where(l => l.Title == title).FirstOrDefault(); 
+            return _context.Homeworks.Where(l => l.Title == title).FirstOrDefault();
         }
 
         public bool HomeworkExists(int id)
@@ -40,15 +40,8 @@ namespace Uranus.Repository
             return homework.Materials;
         }
 
-        public bool CreateHomework(Homework homework, int lessonId, string title, string description, string[] materials, DateTime deadline, bool isDone)
+        public bool CreateHomework(Homework homework)
         {
-            homework.Title = title;
-            homework.Description = description;
-            homework.Materials = materials;
-            homework.Deadline = deadline;
-            homework.IsDone = isDone;
-            homework.Lesson.Id = lessonId;
-
             _context.Homeworks.Add(homework);
 
             return Save();
@@ -61,7 +54,7 @@ namespace Uranus.Repository
             return Save();
         }
 
-        public bool DeleteHomework(Homework homework) 
+        public bool DeleteHomework(Homework homework)
         {
             _context.Remove(homework);
 

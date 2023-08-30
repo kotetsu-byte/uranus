@@ -9,7 +9,7 @@ namespace Uranus.Interfaces
         public Homework GetHomeworkByTitle(string title);
         public bool HomeworkExists(int id);
         public string[] GetMaterials(int id);
-        public bool CreateHomework(Homework homework, int lessonID, string title, string description, string[] materials, DateTime deadline, bool isDone);
+        public bool CreateHomework(Homework homework);
         public bool UpdateHomework(Homework homework);
         public bool DeleteHomework(Homework homework);
         public bool Save();

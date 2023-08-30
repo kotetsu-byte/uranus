@@ -13,10 +13,10 @@ namespace Uranus.Seed
 
         public void SeedDataContext()
         {
-            if(!dataContext.UserCourses.Any())
+            if (!dataContext.UserCourses.Any())
             {
                 var userCourses = new List<UserCourse>()
-                { 
+                {
                     new UserCourse()
                     {
                         User = new User() {

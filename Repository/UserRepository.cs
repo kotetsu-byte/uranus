@@ -7,13 +7,14 @@ namespace Uranus.Repository
     public class UserRepository : IUserRepository
     {
         private readonly DataContext _context;
-        public UserRepository(DataContext context) { 
+        public UserRepository(DataContext context)
+        {
             _context = context;
         }
 
         public ICollection<User> GetUsers()
         {
-            
+
             return _context.Users.OrderBy(p => p.Id).ToList();
         }
 
@@ -37,13 +38,8 @@ namespace Uranus.Repository
             return _context.Users.Any(p => p.Id == id);
         }
 
-        public bool CreateUser(User user, string login, string email, string password) 
+        public bool CreateUser(User user)
         {
-            
-            user.Login = login;
-            user.Email = email;
-            user.Password = password;
-
             _context.Add(user);
 
             return Save();
@@ -56,7 +52,7 @@ namespace Uranus.Repository
             return Save();
         }
 
-        public bool DeleteUser(User user) 
+        public bool DeleteUser(User user)
         {
             _context.Remove(user);
 
