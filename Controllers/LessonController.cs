@@ -40,7 +40,7 @@ namespace Uranus.Controllers
             if (!_lessonRepository.LessonExists(id))
                 return NotFound();
 
-            var lesson = _mapper.Map<List<LessonDto>>(_lessonRepository.GetLessonById(id));
+            var lesson = _mapper.Map<LessonDto>(_lessonRepository.GetLessonById(id));
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -53,7 +53,7 @@ namespace Uranus.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetVideos(int id)
         {
-            var videos = _mapper.Map<List<LessonDto>>(_lessonRepository.GetVideos(id));
+            var videos = _mapper.Map<LessonDto>(_lessonRepository.GetVideos(id));
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -66,7 +66,7 @@ namespace Uranus.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetDocs(int id)
         {
-            var docs = _mapper.Map<List<LessonDto>>(_lessonRepository.GetDocs(id));
+            var docs = _mapper.Map<LessonDto>(_lessonRepository.GetDocs(id));
 
             if (!ModelState.IsValid)
                 return BadRequest();

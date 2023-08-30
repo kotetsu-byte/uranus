@@ -40,7 +40,7 @@ namespace Uranus.Controllers
             if (!_courseRepository.CourseExists(id))
                 return NotFound();
 
-            var course = _mapper.Map<List<CourseDto>>(_courseRepository.GetCourseById(id));
+            var course = _mapper.Map<CourseDto>(_courseRepository.GetCourseById(id));
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -53,7 +53,7 @@ namespace Uranus.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetTests(int id)
         {
-            var tests = _mapper.Map<List<CourseDto>>(_courseRepository.GetTests(id));
+            var tests = _mapper.Map<CourseDto>(_courseRepository.GetTests(id));
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

@@ -40,7 +40,7 @@ namespace Uranus.Controllers
             if (!_homeworkRepository.HomeworkExists(id))
                 return NotFound();
 
-            var homework = _mapper.Map<List<HomeworkDto>>(_homeworkRepository.GetHomeworkById(id));
+            var homework = _mapper.Map<HomeworkDto>(_homeworkRepository.GetHomeworkById(id));
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -53,7 +53,7 @@ namespace Uranus.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetMaterials(int id)
         {
-            var materials = _mapper.Map<List<HomeworkDto>>(_homeworkRepository.GetMaterials(id));
+            var materials = _mapper.Map<HomeworkDto>(_homeworkRepository.GetMaterials(id));
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

@@ -38,7 +38,7 @@ namespace Uranus.Controllers
             if (!_userRepository.UserExists(id))
                 return NotFound();
 
-            var user = _mapper.Map<List<UserDto>>(_userRepository.GetUserById(id));
+            var user = _mapper.Map<UserDto>(_userRepository.GetUserById(id));
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
