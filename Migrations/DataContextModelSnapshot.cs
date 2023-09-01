@@ -116,6 +116,27 @@ namespace Uranus.Migrations
                     b.ToTable("Lessons");
                 });
 
+            modelBuilder.Entity("Uranus.Models.Login", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Logins");
+                });
+
             modelBuilder.Entity("Uranus.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -128,15 +149,15 @@ namespace Uranus.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Login")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("text");
 

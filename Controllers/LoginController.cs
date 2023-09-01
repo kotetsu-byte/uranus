@@ -16,45 +16,32 @@ namespace Uranus.Controllers
     [ApiController]
     public class LoginController : Controller
     {
-        public static Login obj = new Login();
-        private readonly IConfiguration _config;
         private readonly ILoginRepository _loginRepository;
         private readonly IMapper _mapper;
-        public LoginController(IConfiguration config)
+        private readonly IConfiguration _config;
+        public LoginController(IConfiguration configuration, ILoginRepository loginRepository, IMapper mapper)
         {
-            _config = config;   
+            _config = configuration;
+            _loginRepository = loginRepository;
+            _mapper = mapper;
         }
 
         [HttpPost("register")]
-        public ActionResult<Login> Register(LoginDto request)
-        {
-            string password
-                = BCrypt.Net.BCrypt.HashPassword(request.Password);
-
-            obj.Username = request.Username;
-            obj.Password = password;
-            
-            var loginMap = _mapper.Map<Login>(obj);
+        public IActionResult Register([FromBody] LoginDto request)
+        {    
+            var loginMap = _mapper.Map<Login>(request);
 
             _loginRepository.CreateLogin(loginMap);
 
-            return Ok(obj);
+            return Ok(loginMap);
         }
 
         [HttpPost("login")]
-        public ActionResult<Login> Login(LoginDto request)
+        public IActionResult Login([FromBody] LoginDto request)
         {
-            if(obj.Username != request.Username)
-            {
-                return BadRequest("User not found");
-            }
+            var token = _mapper.Map<Login>(request);
 
-            if(!BCrypt.Net.BCrypt.Verify(request.Password, obj.Password))
-            {
-                return BadRequest("Wrong password");
-            }
-
-            string token = CreateToken(obj);
+            CreateToken(token);
 
             return Ok(token);
         }
@@ -63,12 +50,12 @@ namespace Uranus.Controllers
         {
             List<Claim> claims = new List<Claim> 
             { 
-                new Claim(ClaimTypes.Name, obj.Username)
+                new Claim(ClaimTypes.Name, login.Username)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:Token").Value!));
 
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
 
             var token = new JwtSecurityToken(
                 claims: claims,
@@ -93,13 +80,7 @@ namespace Uranus.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetLoginById(int id)
         {
-            try
-            {
                 return Ok(_mapper.Map<LoginDto>(_loginRepository.GetLoginById(id)));
-            } catch(Exception ex)
-            {
-                return NotFound();
-            }
         }
 
         [HttpPut]

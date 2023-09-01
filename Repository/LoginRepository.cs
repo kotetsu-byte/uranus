@@ -21,13 +21,7 @@ namespace Uranus.Repository
 
         public Login GetLoginById(int id)
         {
-            try
-            {
-                return _context.Logins.Where(l => l.Id == id).First();
-            }catch (Exception ex)
-            {
-                throw new NotFoundException();
-            }
+                return _context.Logins.Where(l => l.Id == id).FirstOrDefault();
         }
 
         public Login GetLoginByUsername(string username)
@@ -48,7 +42,7 @@ namespace Uranus.Repository
 
         public bool CreateLogin(Login login)
         {
-            if (!LoginExists(login.Id))
+            if (LoginExists(login.Id))
                 throw new NotFoundException();
 
             _context.Add(login);

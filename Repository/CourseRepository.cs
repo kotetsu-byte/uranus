@@ -63,7 +63,7 @@ namespace Uranus.Repository
 
         public bool CreateCourse(Course course)
         {
-            if (!CourseExists(course.Id))
+            if (CourseExists(course.Id))
                 throw new NotFoundException();
 
             _context.Add(course);

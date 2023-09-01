@@ -7,7 +7,7 @@ namespace Uranus.Token
     {
         public const string ISSUER = "Uranus";
         public const string AUDIENCE = "UranusUsers";
-        const string KEY = "uranus_napa";
+        const string KEY = "dLWDBAWLEUBAWLECHAWOEIIFJHA;WOEIFJHA;WOEIFHOIHOIHOHOI";
         public const int LIFETIME = 1;
         public static SymmetricSecurityKey GetSymmetricSecurityKey()
         {

@@ -12,7 +12,7 @@ using Uranus.Data;
 namespace Uranus.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230829083343_Init")]
+    [Migration("20230831121138_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -119,6 +119,27 @@ namespace Uranus.Migrations
                     b.ToTable("Lessons");
                 });
 
+            modelBuilder.Entity("Uranus.Models.Login", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Logins");
+                });
+
             modelBuilder.Entity("Uranus.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -131,15 +152,15 @@ namespace Uranus.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Login")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("text");
 

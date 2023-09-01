@@ -59,7 +59,7 @@ namespace Uranus.Repository
 
         public bool CreateUser(User user)
         {
-            if (!UserExists(user.Id))
+            if (UserExists(user.Id))
                 throw new NotFoundException();
             
             _context.Add(user);

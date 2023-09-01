@@ -44,7 +44,7 @@ namespace Uranus.Controllers
         [HttpPost]
         [ProducesResponseType(204, Type = typeof(bool))]
         [ProducesResponseType(400)]
-        public IActionResult CreateUser([FromBody] User userCreate)
+        public IActionResult CreateUser([FromBody] UserDto userCreate)
         {
             var userMap = _mapper.Map<User>(userCreate);
 

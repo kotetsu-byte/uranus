@@ -29,6 +29,20 @@ namespace Uranus.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Logins",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Username = table.Column<string>(type: "text", nullable: false),
+                    Password = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Logins", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -36,7 +50,7 @@ namespace Uranus.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
-                    Login = table.Column<string>(type: "text", nullable: false),
+                    Username = table.Column<string>(type: "text", nullable: false),
                     Password = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
@@ -135,6 +149,9 @@ namespace Uranus.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Homeworks");
+
+            migrationBuilder.DropTable(
+                name: "Logins");
 
             migrationBuilder.DropTable(
                 name: "UserCourses");

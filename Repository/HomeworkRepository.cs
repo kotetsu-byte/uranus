@@ -61,7 +61,7 @@ namespace Uranus.Repository
 
         public bool CreateHomework(Homework homework)
         {
-            if (!HomeworkExists(homework.Id))
+            if (HomeworkExists(homework.Id))
                 throw new NotFoundException();
             
             _context.Homeworks.Add(homework);

@@ -63,7 +63,7 @@ namespace Uranus.Repository
 
         public bool CreateLesson(Lesson lesson)
         {
-            if (!LessonExists(lesson.Id))
+            if (LessonExists(lesson.Id))
                 throw new NotFoundException();
             
             _context.Lessons.Add(lesson);
