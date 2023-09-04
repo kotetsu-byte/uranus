@@ -39,17 +39,17 @@ namespace Uranus.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginDto request)
         {
-            var token = _mapper.Map<Login>(request);
+            var loginMap = _mapper.Map<Login>(request);
 
-            CreateToken(token);
+            var token = CreateToken(loginMap);
 
             return Ok(token);
         }
 
         private string CreateToken(Login login)
         {
-            List<Claim> claims = new List<Claim> 
-            { 
+            List<Claim> claims = new List<Claim>
+            {
                 new Claim(ClaimTypes.Name, login.Username)
             };
 

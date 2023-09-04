@@ -62,7 +62,7 @@ namespace Uranus.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(204, Type = typeof(bool))]
+        [ProducesResponseType(204, Type = typeof(Course))]
         [ProducesResponseType(400)]
         public IActionResult CreateCourse([FromBody] CourseDto courseCreate)
         {
