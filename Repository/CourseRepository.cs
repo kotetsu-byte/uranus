@@ -47,7 +47,7 @@ namespace Uranus.Repository
             return _context.Courses.Any(c => c.Id == id);
         }
 
-        public string[] GetTests(int id)
+        public ICollection<Test> GetTests(int id)
         {
             try
             {
@@ -66,7 +66,7 @@ namespace Uranus.Repository
             if (CourseExists(course.Id))
                 throw new NotFoundException();
 
-            _context.Add(course);
+            _context.Courses.Add(course);
 
             return Save();
         }
@@ -76,7 +76,7 @@ namespace Uranus.Repository
             if (!CourseExists(course.Id))
                 throw new NotFoundException();
 
-            _context.Update(course);
+            _context.Courses.Update(course);
 
             return Save();
         }
@@ -86,7 +86,7 @@ namespace Uranus.Repository
             if (!CourseExists(course.Id))
                 throw new NotFoundException();
 
-            _context.Remove(course);
+            _context.Courses.Remove(course);
 
             return Save();
         }

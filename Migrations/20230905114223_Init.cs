@@ -20,8 +20,7 @@ namespace Uranus.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
-                    Price = table.Column<double>(type: "double precision", nullable: false),
-                    Tests = table.Column<string[]>(type: "text[]", nullable: false)
+                    Price = table.Column<double>(type: "double precision", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -65,8 +64,6 @@ namespace Uranus.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Info = table.Column<string>(type: "text", nullable: false),
-                    Videos = table.Column<string[]>(type: "text[]", nullable: false),
-                    Docs = table.Column<string[]>(type: "text[]", nullable: false),
                     CourseId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
@@ -78,6 +75,28 @@ namespace Uranus.Migrations
                         principalTable: "Courses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Tests",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Question = table.Column<string>(type: "text", nullable: false),
+                    Answers = table.Column<string[]>(type: "text[]", nullable: false),
+                    CorrectAnswer = table.Column<int>(type: "integer", nullable: false),
+                    Points = table.Column<int>(type: "integer", nullable: false),
+                    CourseId = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tests", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Tests_Courses_CourseId",
+                        column: x => x.CourseId,
+                        principalTable: "Courses",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -105,6 +124,26 @@ namespace Uranus.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Docs",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Title = table.Column<string>(type: "text", nullable: false),
+                    Url = table.Column<string>(type: "text", nullable: false),
+                    LessonId = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Docs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Docs_Lessons_LessonId",
+                        column: x => x.LessonId,
+                        principalTable: "Lessons",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Homeworks",
                 columns: table => new
                 {
@@ -112,7 +151,6 @@ namespace Uranus.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Title = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
-                    Materials = table.Column<string[]>(type: "text[]", nullable: false),
                     Deadline = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     IsDone = table.Column<bool>(type: "boolean", nullable: false),
                     LessonId = table.Column<int>(type: "integer", nullable: false)
@@ -128,6 +166,50 @@ namespace Uranus.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Videos",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Url = table.Column<string>(type: "text", nullable: false),
+                    LessonId = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Videos", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Videos_Lessons_LessonId",
+                        column: x => x.LessonId,
+                        principalTable: "Lessons",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Materials",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Title = table.Column<string>(type: "text", nullable: false),
+                    Url = table.Column<string>(type: "text", nullable: false),
+                    HomeworkId = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Materials", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Materials_Homeworks_HomeworkId",
+                        column: x => x.HomeworkId,
+                        principalTable: "Homeworks",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Docs_LessonId",
+                table: "Docs",
+                column: "LessonId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_Homeworks_LessonId",
                 table: "Homeworks",
@@ -139,28 +221,55 @@ namespace Uranus.Migrations
                 column: "CourseId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Materials_HomeworkId",
+                table: "Materials",
+                column: "HomeworkId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tests_CourseId",
+                table: "Tests",
+                column: "CourseId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserCourses_CourseId",
                 table: "UserCourses",
                 column: "CourseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Videos_LessonId",
+                table: "Videos",
+                column: "LessonId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Homeworks");
+                name: "Docs");
 
             migrationBuilder.DropTable(
                 name: "Logins");
 
             migrationBuilder.DropTable(
+                name: "Materials");
+
+            migrationBuilder.DropTable(
+                name: "Tests");
+
+            migrationBuilder.DropTable(
                 name: "UserCourses");
 
             migrationBuilder.DropTable(
-                name: "Lessons");
+                name: "Videos");
+
+            migrationBuilder.DropTable(
+                name: "Homeworks");
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Lessons");
 
             migrationBuilder.DropTable(
                 name: "Courses");

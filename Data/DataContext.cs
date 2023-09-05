@@ -12,6 +12,10 @@ namespace Uranus.Data
         public DbSet<Lesson> Lessons { get; set; }
         public DbSet<Homework> Homeworks { get; set; }
         public DbSet<Login> Logins { get; set; }
+        public DbSet<Test> Tests { get; set; }
+        public DbSet<Video> Videos { get; set; }
+        public DbSet<Doc> Docs { get; set; }
+        public DbSet<Material> Materials { get; set; }
         public DbSet<UserCourse> UserCourses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

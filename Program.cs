@@ -37,6 +37,10 @@ builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<ILessonRepository, LessonRepository>();
 builder.Services.AddScoped<IHomeworkRepository, HomeworkRepository>();
 builder.Services.AddScoped<ILoginRepository, LoginRepository>();
+builder.Services.AddScoped<ITestRepository, TestRepository>();
+builder.Services.AddScoped<IVideoRepository, VideoRepository>();
+builder.Services.AddScoped<IDocRepository, DocRepository>();
+builder.Services.AddScoped<IMaterialRepository, MaterialRepository>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

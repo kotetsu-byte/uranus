@@ -62,7 +62,7 @@ namespace Uranus.Repository
             if (UserExists(user.Id))
                 throw new NotFoundException();
             
-            _context.Add(user);
+            _context.Users.Add(user);
 
             return Save();
         }
@@ -72,7 +72,7 @@ namespace Uranus.Repository
             if (!UserExists(user.Id))
                 throw new NotFoundException();
 
-            _context.Update(user);
+            _context.Users.Update(user);
 
             return Save();
         }
@@ -82,7 +82,7 @@ namespace Uranus.Repository
             if (!UserExists(user.Id))
                 throw new NotFoundException();
 
-            _context.Remove(user);
+            _context.Users.Remove(user);
 
             return Save();
         }

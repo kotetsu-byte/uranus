@@ -8,7 +8,7 @@ namespace Uranus.Interfaces
         public Course GetCourseById(int id);
         public Course GetCourseByName(string courseName);
         public bool CourseExists(int id);
-        public string[] GetTests(int id);
+        public ICollection<Test> GetTests(int id);
         public bool CreateCourse(Course course);
         public bool UpdateCourse(Course course);
         public bool DeleteCourse(Course course);

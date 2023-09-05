@@ -41,13 +41,35 @@ namespace Uranus.Migrations
                     b.Property<double>("Price")
                         .HasColumnType("double precision");
 
-                    b.Property<string[]>("Tests")
-                        .IsRequired()
-                        .HasColumnType("text[]");
-
                     b.HasKey("Id");
 
                     b.ToTable("Courses");
+                });
+
+            modelBuilder.Entity("Uranus.Models.Doc", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("LessonId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LessonId");
+
+                    b.ToTable("Docs");
                 });
 
             modelBuilder.Entity("Uranus.Models.Homework", b =>
@@ -71,10 +93,6 @@ namespace Uranus.Migrations
                     b.Property<int>("LessonId")
                         .HasColumnType("integer");
 
-                    b.Property<string[]>("Materials")
-                        .IsRequired()
-                        .HasColumnType("text[]");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
@@ -97,17 +115,9 @@ namespace Uranus.Migrations
                     b.Property<int>("CourseId")
                         .HasColumnType("integer");
 
-                    b.Property<string[]>("Docs")
-                        .IsRequired()
-                        .HasColumnType("text[]");
-
                     b.Property<string>("Info")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<string[]>("Videos")
-                        .IsRequired()
-                        .HasColumnType("text[]");
 
                     b.HasKey("Id");
 
@@ -135,6 +145,64 @@ namespace Uranus.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Logins");
+                });
+
+            modelBuilder.Entity("Uranus.Models.Material", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("HomeworkId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HomeworkId");
+
+                    b.ToTable("Materials");
+                });
+
+            modelBuilder.Entity("Uranus.Models.Test", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string[]>("Answers")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<int>("CorrectAnswer")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("CourseId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Points")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Question")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.ToTable("Tests");
                 });
 
             modelBuilder.Entity("Uranus.Models.User", b =>
@@ -181,6 +249,35 @@ namespace Uranus.Migrations
                     b.ToTable("UserCourses");
                 });
 
+            modelBuilder.Entity("Uranus.Models.Video", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("LessonId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LessonId");
+
+                    b.ToTable("Videos");
+                });
+
+            modelBuilder.Entity("Uranus.Models.Doc", b =>
+                {
+                    b.HasOne("Uranus.Models.Lesson", null)
+                        .WithMany("Docs")
+                        .HasForeignKey("LessonId");
+                });
+
             modelBuilder.Entity("Uranus.Models.Homework", b =>
                 {
                     b.HasOne("Uranus.Models.Lesson", "Lesson")
@@ -203,6 +300,20 @@ namespace Uranus.Migrations
                     b.Navigation("Course");
                 });
 
+            modelBuilder.Entity("Uranus.Models.Material", b =>
+                {
+                    b.HasOne("Uranus.Models.Homework", null)
+                        .WithMany("Materials")
+                        .HasForeignKey("HomeworkId");
+                });
+
+            modelBuilder.Entity("Uranus.Models.Test", b =>
+                {
+                    b.HasOne("Uranus.Models.Course", null)
+                        .WithMany("Tests")
+                        .HasForeignKey("CourseId");
+                });
+
             modelBuilder.Entity("Uranus.Models.UserCourse", b =>
                 {
                     b.HasOne("Uranus.Models.Course", "Course")
@@ -222,16 +333,34 @@ namespace Uranus.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Uranus.Models.Video", b =>
+                {
+                    b.HasOne("Uranus.Models.Lesson", null)
+                        .WithMany("Videos")
+                        .HasForeignKey("LessonId");
+                });
+
             modelBuilder.Entity("Uranus.Models.Course", b =>
                 {
                     b.Navigation("Lessons");
 
+                    b.Navigation("Tests");
+
                     b.Navigation("UserCourses");
+                });
+
+            modelBuilder.Entity("Uranus.Models.Homework", b =>
+                {
+                    b.Navigation("Materials");
                 });
 
             modelBuilder.Entity("Uranus.Models.Lesson", b =>
                 {
+                    b.Navigation("Docs");
+
                     b.Navigation("Homeworks");
+
+                    b.Navigation("Videos");
                 });
 
             modelBuilder.Entity("Uranus.Models.User", b =>

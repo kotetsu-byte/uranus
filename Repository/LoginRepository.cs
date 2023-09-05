@@ -45,7 +45,7 @@ namespace Uranus.Repository
             if (LoginExists(login.Id))
                 throw new NotFoundException();
 
-            _context.Add(login);
+            _context.Logins.Add(login);
 
             return Save();
         }
@@ -55,7 +55,7 @@ namespace Uranus.Repository
             if(!LoginExists(login.Id))
                 throw new NotFoundException();
 
-            _context.Update(login);
+            _context.Logins.Update(login);
 
             return Save();
         }
@@ -65,7 +65,7 @@ namespace Uranus.Repository
             if(!LoginExists(login.Id))
                 throw new NotFoundException();
 
-            _context.Remove(login);
+            _context.Logins.Remove(login);
 
             return Save();
         }

@@ -35,7 +35,7 @@ namespace Uranus.Repository
             return _context.Lessons.Any(l => l.Id == id);
         }
 
-        public string[] GetVideos(int id)
+        public ICollection<Video> GetVideos(int id)
         {
             var lesson = _context.Lessons.Where(c => c.Id == id).First();
 
@@ -48,7 +48,7 @@ namespace Uranus.Repository
             }
         }
 
-        public string[] GetDocs(int id)
+        public ICollection<Doc> GetDocs(int id)
         {
             var lesson = _context.Lessons.Where(c => c.Id == id).First();
 
@@ -76,7 +76,7 @@ namespace Uranus.Repository
             if (!LessonExists(lesson.Id))
                 throw new NotFoundException();
 
-            _context.Update(lesson);
+            _context.Lessons.Update(lesson);
 
             return Save();
         }
@@ -86,7 +86,7 @@ namespace Uranus.Repository
             if (!LessonExists(lesson.Id))
                 throw new NotFoundException();
 
-            _context.Remove(lesson);
+            _context.Lessons.Remove(lesson);
 
             return Save();
         }

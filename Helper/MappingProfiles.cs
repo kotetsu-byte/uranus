@@ -18,6 +18,14 @@ namespace Uranus.Helper
             CreateMap<HomeworkDto, Homework>();
             CreateMap<Login, LoginDto>();
             CreateMap<LoginDto, Login>();
+            CreateMap<Test, TestDto>();
+            CreateMap<TestDto, Test>();
+            CreateMap<Video, VideoDto>();
+            CreateMap<VideoDto, Video>();
+            CreateMap<Doc, DocDto>();
+            CreateMap<DocDto, Doc>();
+            CreateMap<Material, MaterialDto>();
+            CreateMap<MaterialDto, Material>();
         }
     }
 }

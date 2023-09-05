@@ -46,7 +46,7 @@ namespace Uranus.Repository
             return _context.Homeworks.Any(l => l.Id == id);
         }
 
-        public string[] GetMaterials(int id)
+        public ICollection<Material> GetMaterials(int id)
         {
             var homework = _context.Homeworks.Where(h => h.Id == id).First();
 
@@ -74,7 +74,7 @@ namespace Uranus.Repository
             if (!HomeworkExists(homework.Id))
                 throw new NotFoundException();
 
-            _context.Update(homework);
+            _context.Homeworks.Update(homework);
 
             return Save();
         }
@@ -84,7 +84,7 @@ namespace Uranus.Repository
             if (!HomeworkExists(homework.Id))
                 throw new NotFoundException();
 
-            _context.Remove(homework);
+            _context.Homeworks.Remove(homework);
 
             return Save();
         }

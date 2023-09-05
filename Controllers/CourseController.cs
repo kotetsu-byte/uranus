@@ -36,6 +36,7 @@ namespace Uranus.Controllers
         public IActionResult GetCourseById(int id)
         {
             var course = _mapper.Map<CourseDto>(_courseRepository.GetCourseById(id));
+            
             try
             {
                 return Ok(course);
