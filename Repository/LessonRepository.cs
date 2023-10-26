@@ -24,7 +24,8 @@ namespace Uranus.Repository
             try
             {
                 return _context.Lessons.Where(l => l.Id == id).First();
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new NotFoundException();
             }
@@ -42,7 +43,8 @@ namespace Uranus.Repository
             try
             {
                 return lesson.Videos;
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new NotFoundException();
             }
@@ -55,7 +57,8 @@ namespace Uranus.Repository
             try
             {
                 return lesson.Docs;
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new NotFoundException();
             }
@@ -65,7 +68,7 @@ namespace Uranus.Repository
         {
             if (LessonExists(lesson.Id))
                 throw new NotFoundException();
-            
+
             _context.Lessons.Add(lesson);
 
             return Save();

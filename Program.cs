@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -5,10 +6,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Uranus.Data;
 using Uranus.Interfaces;
+using Uranus.Models;
 using Uranus.Repository;
 using Uranus.Token;
-using AutoMapper;
-using Uranus.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 

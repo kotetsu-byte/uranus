@@ -40,7 +40,8 @@ namespace Uranus.Controllers
             try
             {
                 return Ok(lesson);
-            } catch(NotFoundException ex)
+            }
+            catch (NotFoundException ex)
             {
                 return NotFound();
             }
@@ -56,7 +57,8 @@ namespace Uranus.Controllers
             try
             {
                 return Ok(videos);
-            } catch(NotFoundException ex)
+            }
+            catch (NotFoundException ex)
             {
                 return NotFound();
             }
@@ -72,7 +74,8 @@ namespace Uranus.Controllers
             try
             {
                 return Ok(docs);
-            } catch(NotFoundException ex) 
+            }
+            catch (NotFoundException ex)
             {
                 return NotFound();
             }
@@ -86,7 +89,7 @@ namespace Uranus.Controllers
             var lessonMap = _mapper.Map<Lesson>(lessonCreate);
 
             _lessonRepository.CreateLesson(lessonMap);
-            
+
             return Ok("Successfully created");
         }
 

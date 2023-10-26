@@ -32,14 +32,15 @@ namespace Uranus.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(200, Type = typeof(Test))]
         [ProducesResponseType(400)]
-        public IActionResult GetTestById(int id) 
+        public IActionResult GetTestById(int id)
         {
             var test = _mapper.Map<TestDto>(_testRepository.GetTestById(id));
 
             try
             {
                 return Ok(test);
-            } catch(NotFoundException ex)
+            }
+            catch (NotFoundException ex)
             {
                 return NotFound();
             }

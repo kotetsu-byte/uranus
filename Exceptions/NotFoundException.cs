@@ -1,7 +1,7 @@
 ﻿namespace Uranus.Exceptions
 {
-    public class NotFoundException:Exception
+    public class NotFoundException : Exception
     {
 
-    }   
+    }
 }

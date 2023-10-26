@@ -24,14 +24,15 @@ namespace Uranus.Repository
             try
             {
                 return _context.Tests.Where(t => t.Id == id).First();
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new NotFoundException();
             }
         }
 
-        public bool TestExists(int id) 
-        { 
+        public bool TestExists(int id)
+        {
             return _context.Tests.Any(t => t.Id == id);
         }
 
@@ -47,7 +48,7 @@ namespace Uranus.Repository
 
         public bool UpdateTest(Test test)
         {
-            if(!TestExists(test.Id))
+            if (!TestExists(test.Id))
                 throw new NotFoundException();
 
             _context.Tests.Update(test);
@@ -55,7 +56,7 @@ namespace Uranus.Repository
             return Save();
         }
 
-        public bool DeleteTest(Test test) 
+        public bool DeleteTest(Test test)
         {
             if (!TestExists(test.Id))
                 throw new NotFoundException();

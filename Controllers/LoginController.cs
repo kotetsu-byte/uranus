@@ -28,7 +28,7 @@ namespace Uranus.Controllers
 
         [HttpPost("register")]
         public IActionResult Register([FromBody] LoginDto request)
-        {    
+        {
             var loginMap = _mapper.Map<Login>(request);
 
             _loginRepository.CreateLogin(loginMap);
@@ -60,7 +60,7 @@ namespace Uranus.Controllers
             var token = new JwtSecurityToken(
                 claims: claims,
                 expires: DateTime.Now.AddDays(1),
-                signingCredentials: creds 
+                signingCredentials: creds
             );
 
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
@@ -80,7 +80,7 @@ namespace Uranus.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetLoginById(int id)
         {
-                return Ok(_mapper.Map<LoginDto>(_loginRepository.GetLoginById(id)));
+            return Ok(_mapper.Map<LoginDto>(_loginRepository.GetLoginById(id)));
         }
 
         [HttpPut]

@@ -39,7 +39,8 @@ namespace Uranus.Controllers
             try
             {
                 return Ok(video);
-            } catch(NotFoundException ex)
+            }
+            catch (NotFoundException ex)
             {
                 return NotFound();
             }

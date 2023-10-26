@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Uranus.Models;
+
 namespace Uranus.Data
 {
     public class DataContext : DbContext

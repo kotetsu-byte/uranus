@@ -36,11 +36,12 @@ namespace Uranus.Controllers
         public IActionResult GetCourseById(int id)
         {
             var course = _mapper.Map<CourseDto>(_courseRepository.GetCourseById(id));
-            
+
             try
             {
                 return Ok(course);
-            }catch(NotFoundException ex)
+            }
+            catch (NotFoundException ex)
             {
                 return NotFound();
             }
@@ -56,7 +57,8 @@ namespace Uranus.Controllers
                 var tests = _mapper.Map<CourseDto>(_courseRepository.GetTests(id));
 
                 return Ok(tests);
-            }catch (NotFoundException ex) 
+            }
+            catch (NotFoundException ex)
             {
                 return NotFound();
             }
@@ -96,7 +98,7 @@ namespace Uranus.Controllers
             var courseToDelete = _courseRepository.GetCourseById(id);
 
             _courseRepository.DeleteCourse(courseToDelete);
-            
+
             return NoContent();
         }
     }

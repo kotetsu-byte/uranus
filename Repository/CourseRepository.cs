@@ -16,7 +16,7 @@ namespace Uranus.Repository
 
         public ICollection<Course> GetCourses()
         {
-            
+
             return _context.Courses.OrderBy(c => c.Id).ToList();
         }
 
@@ -25,7 +25,8 @@ namespace Uranus.Repository
             try
             {
                 return _context.Courses.Where(c => c.Id == id).First();
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new NotFoundException();
             }
@@ -36,7 +37,8 @@ namespace Uranus.Repository
             try
             {
                 return _context.Courses.Where(c => c.Name == name).First();
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new NotFoundException();
             }

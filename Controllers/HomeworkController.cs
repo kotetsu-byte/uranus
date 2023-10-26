@@ -36,11 +36,12 @@ namespace Uranus.Controllers
         public IActionResult GetHomeworkById(int id)
         {
             var homework = _mapper.Map<HomeworkDto>(_homeworkRepository.GetHomeworkById(id));
-            
+
             try
             {
                 return Ok(homework);
-            } catch(NotFoundException ex)
+            }
+            catch (NotFoundException ex)
             {
                 return NotFound();
             }
@@ -56,7 +57,8 @@ namespace Uranus.Controllers
             try
             {
                 return Ok(materials);
-            } catch(NotFoundException ex)
+            }
+            catch (NotFoundException ex)
             {
                 return NotFound();
             }

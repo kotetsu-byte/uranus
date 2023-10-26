@@ -16,20 +16,21 @@ namespace Uranus.Repository
 
         public ICollection<Login> GetLogins()
         {
-            return _context.Logins.OrderBy(l => l.Id).ToList();   
+            return _context.Logins.OrderBy(l => l.Id).ToList();
         }
 
         public Login GetLoginById(int id)
         {
-                return _context.Logins.Where(l => l.Id == id).FirstOrDefault();
+            return _context.Logins.Where(l => l.Id == id).FirstOrDefault();
         }
 
         public Login GetLoginByUsername(string username)
         {
-            try 
+            try
             {
                 return _context.Logins.Where(l => l.Username == username).First();
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new NotFoundException();
             }
@@ -50,9 +51,9 @@ namespace Uranus.Repository
             return Save();
         }
 
-        public bool UpdateLogin(Login login) 
-        { 
-            if(!LoginExists(login.Id))
+        public bool UpdateLogin(Login login)
+        {
+            if (!LoginExists(login.Id))
                 throw new NotFoundException();
 
             _context.Logins.Update(login);
@@ -60,9 +61,9 @@ namespace Uranus.Repository
             return Save();
         }
 
-        public bool DeleteLogin(Login login) 
-        { 
-            if(!LoginExists(login.Id))
+        public bool DeleteLogin(Login login)
+        {
+            if (!LoginExists(login.Id))
                 throw new NotFoundException();
 
             _context.Logins.Remove(login);

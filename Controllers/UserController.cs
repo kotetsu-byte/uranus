@@ -35,7 +35,8 @@ namespace Uranus.Controllers
             try
             {
                 return Ok(_mapper.Map<UserDto>(_userRepository.GetUserById(id)));
-            } catch (NotFoundException ex) 
+            }
+            catch (NotFoundException ex)
             {
                 return NotFound();
             }
@@ -62,7 +63,7 @@ namespace Uranus.Controllers
             var userMap = _mapper.Map<User>(updatedUser);
 
             _userRepository.UpdateUser(userMap);
-            
+
             return NoContent();
         }
 

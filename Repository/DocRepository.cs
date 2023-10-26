@@ -24,7 +24,8 @@ namespace Uranus.Repository
             try
             {
                 return _context.Docs.Where(d => d.Id == id).First();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new NotFoundException();
             }

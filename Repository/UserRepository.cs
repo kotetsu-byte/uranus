@@ -24,7 +24,8 @@ namespace Uranus.Repository
             try
             {
                 return _context.Users.Where(p => p.Id == id).First();
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new NotFoundException();
             }
@@ -35,7 +36,8 @@ namespace Uranus.Repository
             try
             {
                 return _context.Users.Where(p => p.Username == username).First();
-            } catch(Exception) 
+            }
+            catch (Exception)
             {
                 throw new NotFoundException();
             }
@@ -46,7 +48,8 @@ namespace Uranus.Repository
             try
             {
                 return _context.Users.Where(p => p.Email == email).First();
-            } catch(Exception ex) 
+            }
+            catch (Exception ex)
             {
                 throw new NotFoundException();
             }
@@ -61,7 +64,7 @@ namespace Uranus.Repository
         {
             if (UserExists(user.Id))
                 throw new NotFoundException();
-            
+
             _context.Users.Add(user);
 
             return Save();

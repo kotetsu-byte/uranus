@@ -24,7 +24,8 @@ namespace Uranus.Repository
             try
             {
                 return _context.Homeworks.Where(l => l.Id == id).First();
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new NotFoundException();
             }
@@ -35,7 +36,8 @@ namespace Uranus.Repository
             try
             {
                 return _context.Homeworks.Where(l => l.Title == title).First();
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new NotFoundException();
             }
@@ -53,7 +55,8 @@ namespace Uranus.Repository
             try
             {
                 return homework.Materials;
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new NotFoundException();
             }
@@ -63,7 +66,7 @@ namespace Uranus.Repository
         {
             if (HomeworkExists(homework.Id))
                 throw new NotFoundException();
-            
+
             _context.Homeworks.Add(homework);
 
             return Save();

@@ -19,12 +19,13 @@ namespace Uranus.Repository
             return _context.Videos.OrderBy(v => v.Id).ToList();
         }
 
-        public Video GetVideoById(int id) 
-        { 
+        public Video GetVideoById(int id)
+        {
             try
             {
                 return _context.Videos.Where(v => v.Id == id).First();
-            } catch(Exception ex) 
+            }
+            catch (Exception ex)
             {
                 throw new NotFoundException();
             }
