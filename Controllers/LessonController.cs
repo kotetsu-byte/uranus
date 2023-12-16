@@ -1,16 +1,14 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Uranus.Dto;
-using Uranus.Exceptions;
 using Uranus.Interfaces;
 using Uranus.Models;
-using Uranus.Repository;
 
 namespace Uranus.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class LessonController : Controller
+    public class LessonController : ControllerBase
     {
         private readonly ILessonRepository _lessonRepository;
         private readonly IMapper _mapper;
@@ -21,102 +19,50 @@ namespace Uranus.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<Lesson>))]
-        public IActionResult GetLessons()
+        [HttpGet("{courseId}")]
+        public async Task<IActionResult> GetAllLessons(int courseId)
         {
-            var lesson = _mapper.Map<List<LessonDto>>(_lessonRepository.GetLessons());
+            var lessonDtos = _mapper.Map<List<LessonDto>>(await _lessonRepository.GetAllLessons(courseId));
 
-            return Ok(lesson);
+            return Ok(lessonDtos);
         }
 
-        [HttpGet("{id}")]
-        [ProducesResponseType(200, Type = typeof(Lesson))]
-        [ProducesResponseType(400)]
-        public IActionResult GetLessonById(int id)
+        [HttpGet("{courseId}/{id}")]
+        public async Task<IActionResult> GetLessonById(int courseId, int id)
         {
-            var lesson = _mapper.Map<LessonDto>(_lessonRepository.GetLessonById(id));
+            var lessonDto = _mapper.Map<LessonDto>(await _lessonRepository.GetLessonById(courseId, id));
 
-            try
-            {
-                return Ok(lesson);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound();
-            }
+            return Ok(lessonDto);
         }
 
-        [HttpGet("{id}/videos")]
-        [ProducesResponseType(200, Type = typeof(string[]))]
-        [ProducesResponseType(400)]
-        public IActionResult GetVideos(int id)
+        [HttpPost("{courseId}")]
+        public IActionResult CreateLesson([FromBody] LessonDto lessonDto, int courseId)
         {
-            var videos = _mapper.Map<LessonDto>(_lessonRepository.GetVideos(id));
+            var lesson = _mapper.Map<Lesson>(lessonDto);
 
-            try
-            {
-                return Ok(videos);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound();
-            }
-        }
+            lesson.CourseId = courseId;
 
-        [HttpGet("{id}/docs")]
-        [ProducesResponseType(200, Type = typeof(string[]))]
-        [ProducesResponseType(400)]
-        public IActionResult GetDocs(int id)
-        {
-            var docs = _mapper.Map<LessonDto>(_lessonRepository.GetDocs(id));
+            _lessonRepository.Create(lesson);
 
-            try
-            {
-                return Ok(docs);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound();
-            }
-        }
-
-        [HttpPost]
-        [ProducesResponseType(204, Type = typeof(bool))]
-        [ProducesResponseType(400)]
-        public IActionResult CreateLesson([FromBody] LessonDto lessonCreate)
-        {
-            var lessonMap = _mapper.Map<Lesson>(lessonCreate);
-
-            _lessonRepository.CreateLesson(lessonMap);
-
-            return Ok("Successfully created");
+            return Ok("Succeeded");
         }
 
         [HttpPut]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
-        public IActionResult UpdateLesson(int lessonId, [FromBody] LessonDto updatedLesson)
+        public IActionResult UpdateLesson([FromBody] LessonDto lessonDto)
         {
-            var lessonMap = _mapper.Map<Lesson>(updatedLesson);
+            var lesson = _mapper.Map<Lesson>(lessonDto);
 
-            _lessonRepository.UpdateLesson(lessonMap);
+            _lessonRepository.Update(lesson);
 
-            return NoContent();
+            return Ok("Succeeded");
         }
 
         [HttpDelete("{id}")]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
         public IActionResult DeleteLesson(int id)
         {
-            var lessonToDelete = _lessonRepository.GetLessonById(id);
+            _lessonRepository.Delete(id);
 
-            _lessonRepository.DeleteLesson(lessonToDelete);
-
-            return NoContent();
+            return Ok("Succeeded");
         }
     }
 }

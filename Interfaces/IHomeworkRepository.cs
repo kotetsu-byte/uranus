@@ -4,14 +4,11 @@ namespace Uranus.Interfaces
 {
     public interface IHomeworkRepository
     {
-        public ICollection<Homework> GetHomeworks();
-        public Homework GetHomeworkById(int id);
-        public Homework GetHomeworkByTitle(string title);
-        public bool HomeworkExists(int id);
-        public ICollection<Material> GetMaterials(int id);
-        public bool CreateHomework(Homework homework);
-        public bool UpdateHomework(Homework homework);
-        public bool DeleteHomework(Homework homework);
+        public Task<ICollection<Homework>> GetAllHomeworks(int courseId, int lessonId);
+        public Task<Homework> GetHomeworkById(int courseId, int lessonId, int id);
+        public bool Create(Homework homework);
+        public bool Update(Homework homework);
+        public bool Delete(int id);
         public bool Save();
     }
 }

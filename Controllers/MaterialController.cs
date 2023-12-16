@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Uranus.Dto;
-using Uranus.Exceptions;
 using Uranus.Interfaces;
 using Uranus.Models;
 
@@ -9,7 +8,7 @@ namespace Uranus.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MaterialController : Controller
+    public class MaterialController : ControllerBase
     {
         private readonly IMaterialRepository _materialRepository;
         private readonly IMapper _mapper;
@@ -20,68 +19,52 @@ namespace Uranus.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
-        [ProducesResponseType(200, Type = typeof(ICollection<Material>))]
-        public IActionResult GetMaterials()
+        [HttpGet("{courseId}/{lessonId}/{homeworkId}")]
+        public async Task<IActionResult> GetAllMaterials(int courseId, int lessonId, int homeworkId)
         {
-            var materials = _mapper.Map<List<MaterialDto>>(_materialRepository.GetMaterials());
+            var materialDtos = _mapper.Map<List<MaterialDto>>(await _materialRepository.GetAllMaterials(courseId, lessonId, homeworkId));
 
-            return Ok(materials);
+            return Ok(materialDtos);
         }
 
-        [HttpGet("{id}")]
-        [ProducesResponseType(200, Type = typeof(Material))]
-        [ProducesResponseType(400)]
-        public IActionResult GetMaterialById(int id)
+        [HttpGet("{courseId}/{lessonId}/{homeworkId}/{id}")]
+        public async Task<IActionResult> GetMaterialById(int courseId, int lessonId, int homeworkId, int id)
         {
-            var material = _mapper.Map<MaterialDto>(_materialRepository.GetMaterialById(id));
+            var materialDto = _mapper.Map<MaterialDto>(await _materialRepository.GetMaterialById(courseId, lessonId, homeworkId, id));
 
-            try
-            {
-                return Ok(material);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound();
-            }
+            return Ok(materialDto);
         }
 
-        [HttpPost]
-        [ProducesResponseType(204, Type = typeof(Material))]
-        [ProducesResponseType(400)]
-        public IActionResult CreateMaterial([FromBody] MaterialDto materialCreate)
+        [HttpPost("{courseId}/{lessonId}/{homeworkId}")]
+        public IActionResult CreateMaterial([FromBody] MaterialDto materialDto, int courseId, int lessonId, int homeworkId)
         {
-            var materialMap = _mapper.Map<Material>(materialCreate);
+            var material = _mapper.Map<Material>(materialDto);
 
-            _materialRepository.CreateMaterial(materialMap);
+            material.CourseId = courseId;
+            material.LessonId = lessonId;
+            material.HomeworkId = homeworkId;
 
-            return Ok("Created Successfully");
+            _materialRepository.Create(material);
+
+            return Ok("Succeeded");
         }
 
         [HttpPut]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
-        public IActionResult UpdateMaterial([FromBody] MaterialDto updatedMaterial)
+        public IActionResult UpdateMaterial([FromBody] MaterialDto materialDto)
         {
-            var materialMap = _mapper.Map<Material>(updatedMaterial);
+            var material = _mapper.Map<Material>(materialDto);
 
-            _materialRepository.UpdateMaterial(materialMap);
+            _materialRepository.Update(material);
 
-            return Ok("Updated Successfully");
+            return Ok("Succeeded");
         }
 
         [HttpDelete("{id}")]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
         public IActionResult DeleteMaterial(int id)
         {
-            var materialToDelete = _materialRepository.GetMaterialById(id);
+            _materialRepository.Delete(id);
 
-            _materialRepository.DeleteMaterial(materialToDelete);
-
-            return Ok("Deleted Successfully");
+            return Ok("Succeeded");
         }
     }
 }

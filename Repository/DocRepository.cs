@@ -1,5 +1,5 @@
-﻿using Uranus.Data;
-using Uranus.Exceptions;
+﻿using Microsoft.EntityFrameworkCore;
+using Uranus.Data;
 using Uranus.Interfaces;
 using Uranus.Models;
 
@@ -14,53 +14,34 @@ namespace Uranus.Repository
             _context = context;
         }
 
-        public ICollection<Doc> GetDocs()
+        public async Task<ICollection<Doc>> GetAllDocs(int courseId, int lessonId)
         {
-            return _context.Docs.OrderBy(d => d.Id).ToList();
+            return await _context.Docs.Where(d => d.CourseId == courseId && d.LessonId == lessonId).OrderBy(d => d.Id).ToListAsync();
         }
 
-        public Doc GetDocById(int id)
+        public async Task<Doc> GetDocById(int courseId, int lessonId, int id)
         {
-            try
-            {
-                return _context.Docs.Where(d => d.Id == id).First();
-            }
-            catch (Exception ex)
-            {
-                throw new NotFoundException();
-            }
+            return await _context.Docs.Where(d => d.CourseId == courseId && d.LessonId == lessonId && d.Id == id).FirstOrDefaultAsync();
         }
 
-        public bool DocExists(int id)
+        public bool Create(Doc doc)
         {
-            return _context.Docs.Any(d => d.Id == id);
-        }
-
-        public bool CreateDoc(Doc doc)
-        {
-            if (DocExists(doc.Id))
-                throw new NotFoundException();
-
             _context.Docs.Add(doc);
 
             return Save();
         }
 
-        public bool UpdateDoc(Doc doc)
+        public bool Update(Doc doc)
         {
-            if (!DocExists(doc.Id))
-                throw new NotFoundException();
-
             _context.Docs.Update(doc);
 
             return Save();
         }
 
-        public bool DeleteDoc(Doc doc)
+        public bool Delete(int id)
         {
-            if (!DocExists(doc.Id))
-                throw new NotFoundException();
-
+            var doc = _context.Docs.Where(d => d.Id == id).FirstOrDefault();
+            
             _context.Docs.Remove(doc);
 
             return Save();

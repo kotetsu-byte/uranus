@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Uranus.Dto;
-using Uranus.Exceptions;
 using Uranus.Interfaces;
 using Uranus.Models;
 
@@ -10,7 +8,7 @@ namespace Uranus.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : Controller
+    public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
@@ -21,63 +19,43 @@ namespace Uranus.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<User>))]
-        public IActionResult GetUsers()
+        public async Task<IActionResult> GetAllUsers()
         {
-            return Ok(_mapper.Map<List<UserDto>>(_userRepository.GetUsers()));
+            return Ok(_mapper.Map<List<UserDto>>(await _userRepository.GetAllUsers()));
         }
 
         [HttpGet("{id}")]
-        [ProducesResponseType(200, Type = typeof(User))]
-        [ProducesResponseType(400)]
-        public IActionResult GetUserById(int id)
+        public async Task<IActionResult> GetUserById(int id)
         {
-            try
-            {
-                return Ok(_mapper.Map<UserDto>(_userRepository.GetUserById(id)));
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound();
-            }
+            return Ok(_mapper.Map<UserDto>(await _userRepository.GetUserById(id)));
         }
 
         [HttpPost]
-        [ProducesResponseType(204, Type = typeof(bool))]
-        [ProducesResponseType(400)]
-        public IActionResult CreateUser([FromBody] UserDto userCreate)
+        public IActionResult CreateUser([FromBody] UserDto userDto)
         {
-            var userMap = _mapper.Map<User>(userCreate);
+            var user = _mapper.Map<User>(userDto);
 
-            _userRepository.CreateUser(userMap);
+            _userRepository.Create(user);
 
-            return Ok("Successfully created");
+            return Ok("Succeeded");
         }
 
         [HttpPut]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
-        public IActionResult UpdateUser([FromBody] UserDto updatedUser)
+        public IActionResult UpdateUser([FromBody] UserDto userDto)
         {
-            var userMap = _mapper.Map<User>(updatedUser);
+            var user = _mapper.Map<User>(userDto);
 
-            _userRepository.UpdateUser(userMap);
+            _userRepository.Update(user);
 
-            return NoContent();
+            return Ok("Succeeded");
         }
 
         [HttpDelete("{id}")]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
         public IActionResult DeleteUser(int id)
         {
-            var userToDelete = _userRepository.GetUserById(id);
+            _userRepository.Delete(id);
 
-            _userRepository.DeleteUser(userToDelete);
-
-            return NoContent();
+            return Ok("Succeeded");
         }
     }
 }

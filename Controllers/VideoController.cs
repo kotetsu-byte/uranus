@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Uranus.Dto;
-using Uranus.Exceptions;
 using Uranus.Interfaces;
 using Uranus.Models;
 
@@ -9,7 +8,7 @@ namespace Uranus.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class VideoController : Controller
+    public class VideoController : ControllerBase
     {
         private readonly IVideoRepository _videoRepository;
         private readonly IMapper _mapper;
@@ -20,68 +19,51 @@ namespace Uranus.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
-        [ProducesResponseType(200, Type = typeof(ICollection<Video>))]
-        public IActionResult GetVideos()
+        [HttpGet("{courseId}/{lessonId}")]
+        public async Task<IActionResult> GetAllVideos(int courseId, int lessonId)
         {
-            var videos = _mapper.Map<List<VideoDto>>(_videoRepository.GetVideos());
+            var videoDtos = _mapper.Map<List<VideoDto>>(await _videoRepository.GetAllVideos(courseId, lessonId));
 
-            return Ok(videos);
+            return Ok(videoDtos);
         }
 
-        [HttpGet("{id}")]
-        [ProducesResponseType(200, Type = typeof(Video))]
-        [ProducesResponseType(400)]
-        public IActionResult GetVideoById(int id)
+        [HttpGet("{courseId}/{lessonId}/{id}")]
+        public async Task<IActionResult> GetVideoById(int courseId, int lessonId, int id)
         {
-            var video = _mapper.Map<VideoDto>(_videoRepository.GetVideoById(id));
+            var videoDto = _mapper.Map<VideoDto>(await _videoRepository.GetVideoById(courseId, lessonId, id));
 
-            try
-            {
-                return Ok(video);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound();
-            }
+            return Ok(videoDto);
         }
 
-        [HttpPost]
-        [ProducesResponseType(204, Type = typeof(Video))]
-        [ProducesResponseType(400)]
-        public IActionResult CreateVideo([FromBody] VideoDto videoCreate)
+        [HttpPost("{courseId}/{lessonId}")]
+        public IActionResult CreateVideo([FromBody] VideoDto videoDto, int courseId, int lessonId)
         {
-            var videoMap = _mapper.Map<Video>(videoCreate);
+            var video = _mapper.Map<Video>(videoDto);
 
-            _videoRepository.CreateVideo(videoMap);
+            video.CourseId = courseId;
+            video.LessonId = lessonId;
 
-            return Ok("Created Successfully");
+            _videoRepository.Create(video);
+
+            return Ok("Succeeded");
         }
 
         [HttpPut]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
-        public IActionResult UpdateVideo([FromBody] VideoDto updatedVideo)
+        public IActionResult UpdateVideo([FromBody] VideoDto videoDto)
         {
-            var videoMap = _mapper.Map<Video>(updatedVideo);
+            var video = _mapper.Map<Video>(videoDto);
 
-            _videoRepository.UpdateVideo(videoMap);
+            _videoRepository.Update(video);
 
-            return Ok("Updated Successfully");
+            return Ok("Succeeded");
         }
 
         [HttpDelete("{id}")]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
         public IActionResult DeleteVideo(int id)
         {
-            var videoToDelete = _videoRepository.GetVideoById(id);
+            _videoRepository.Delete(id);
 
-            _videoRepository.DeleteVideo(videoToDelete);
-
-            return Ok("Deleted Successfully");
+            return Ok("Succeeded");
         }
     }
 }

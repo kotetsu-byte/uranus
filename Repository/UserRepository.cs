@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using Uranus.Data;
-using Uranus.Exceptions;
 using Uranus.Interfaces;
 using Uranus.Models;
 
@@ -14,77 +14,34 @@ namespace Uranus.Repository
             _context = context;
         }
 
-        public ICollection<User> GetUsers()
+        public async Task<ICollection<User>> GetAllUsers()
         {
-            return _context.Users.OrderBy(p => p.Id).ToList();
+            return await _context.Users.OrderBy(p => p.Id).ToListAsync();
         }
 
-        public User GetUserById(int id)
+        public async Task<User> GetUserById(int id)
         {
-            try
-            {
-                return _context.Users.Where(p => p.Id == id).First();
-            }
-            catch (Exception ex)
-            {
-                throw new NotFoundException();
-            }
+            return await _context.Users.Where(p => p.Id == id).FirstOrDefaultAsync();
         }
 
-        public User GetUserByUsername(string username)
+        public bool Create(User user)
         {
-            try
-            {
-                return _context.Users.Where(p => p.Username == username).First();
-            }
-            catch (Exception)
-            {
-                throw new NotFoundException();
-            }
-        }
-
-        public User GetUserByEmail(string email)
-        {
-            try
-            {
-                return _context.Users.Where(p => p.Email == email).First();
-            }
-            catch (Exception ex)
-            {
-                throw new NotFoundException();
-            }
-        }
-
-        public bool UserExists(int id)
-        {
-            return _context.Users.Any(p => p.Id == id);
-        }
-
-        public bool CreateUser(User user)
-        {
-            if (UserExists(user.Id))
-                throw new NotFoundException();
-
             _context.Users.Add(user);
 
             return Save();
         }
 
-        public bool UpdateUser(User user)
+        public bool Update(User user)
         {
-            if (!UserExists(user.Id))
-                throw new NotFoundException();
-
             _context.Users.Update(user);
 
             return Save();
         }
 
-        public bool DeleteUser(User user)
+        public bool Delete(int id)
         {
-            if (!UserExists(user.Id))
-                throw new NotFoundException();
-
+            var user = _context.Users.Where(u => u.Id == id).FirstOrDefault();
+            
             _context.Users.Remove(user);
 
             return Save();

@@ -4,12 +4,11 @@ namespace Uranus.Interfaces
 {
     public interface IVideoRepository
     {
-        public ICollection<Video> GetVideos();
-        public Video GetVideoById(int id);
-        public bool VideoExists(int id);
-        public bool CreateVideo(Video video);
-        public bool UpdateVideo(Video video);
-        public bool DeleteVideo(Video video);
+        public Task<ICollection<Video>> GetAllVideos(int courseId, int lessonId);
+        public Task<Video> GetVideoById(int courseId, int lessonId, int id);
+        public bool Create(Video video);
+        public bool Update(Video video);
+        public bool Delete(int id);
         public bool Save();
     }
 }

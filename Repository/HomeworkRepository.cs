@@ -1,5 +1,5 @@
-﻿using Uranus.Data;
-using Uranus.Exceptions;
+﻿using Microsoft.EntityFrameworkCore;
+using Uranus.Data;
 using Uranus.Interfaces;
 using Uranus.Models;
 
@@ -14,79 +14,34 @@ namespace Uranus.Repository
             _context = context;
         }
 
-        public ICollection<Homework> GetHomeworks()
+        public async Task<ICollection<Homework>> GetAllHomeworks(int courseId, int lessonId)
         {
-            return _context.Homeworks.OrderBy(h => h.Id).ToList();
+            return await _context.Homeworks.Where(h => h.CourseId == courseId && h.LessonId == lessonId).OrderBy(h => h.Id).ToListAsync();
         }
 
-        public Homework GetHomeworkById(int id)
+        public async Task<Homework> GetHomeworkById(int courseId, int lessonId, int id)
         {
-            try
-            {
-                return _context.Homeworks.Where(l => l.Id == id).First();
-            }
-            catch (Exception ex)
-            {
-                throw new NotFoundException();
-            }
+            return await _context.Homeworks.Where(h => h.CourseId == courseId && h.LessonId == lessonId && h.Id == id).FirstOrDefaultAsync();
         }
 
-        public Homework GetHomeworkByTitle(string title)
+        public bool Create(Homework homework)
         {
-            try
-            {
-                return _context.Homeworks.Where(l => l.Title == title).First();
-            }
-            catch (Exception ex)
-            {
-                throw new NotFoundException();
-            }
-        }
-
-        public bool HomeworkExists(int id)
-        {
-            return _context.Homeworks.Any(l => l.Id == id);
-        }
-
-        public ICollection<Material> GetMaterials(int id)
-        {
-            var homework = _context.Homeworks.Where(h => h.Id == id).First();
-
-            try
-            {
-                return homework.Materials;
-            }
-            catch (Exception ex)
-            {
-                throw new NotFoundException();
-            }
-        }
-
-        public bool CreateHomework(Homework homework)
-        {
-            if (HomeworkExists(homework.Id))
-                throw new NotFoundException();
-
             _context.Homeworks.Add(homework);
 
             return Save();
         }
 
-        public bool UpdateHomework(Homework homework)
+        public bool Update(Homework homework)
         {
-            if (!HomeworkExists(homework.Id))
-                throw new NotFoundException();
-
             _context.Homeworks.Update(homework);
 
             return Save();
         }
 
-        public bool DeleteHomework(Homework homework)
+        public bool Delete(int id)
         {
-            if (!HomeworkExists(homework.Id))
-                throw new NotFoundException();
-
+            var homework = _context.Homeworks.Where(h => h.Id == id).FirstOrDefault();
+            
             _context.Homeworks.Remove(homework);
 
             return Save();

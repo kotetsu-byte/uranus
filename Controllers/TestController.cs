@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Uranus.Dto;
-using Uranus.Exceptions;
 using Uranus.Interfaces;
 using Uranus.Models;
 
@@ -9,7 +8,7 @@ namespace Uranus.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TestController : Controller
+    public class TestController : ControllerBase
     {
         private readonly ITestRepository _testRepository;
         private readonly IMapper _mapper;
@@ -20,68 +19,50 @@ namespace Uranus.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
-        [ProducesResponseType(200, Type = typeof(ICollection<Test>))]
-        public IActionResult GetTests()
+        [HttpGet("{courseId}")]
+        public async Task<IActionResult> GetAllTests(int courseId)
         {
-            var tests = _mapper.Map<List<TestDto>>(_testRepository.GetTests());
+            var testDtos = _mapper.Map<List<TestDto>>(await _testRepository.GetAllTests(courseId));
 
-            return Ok(tests);
+            return Ok(testDtos);
         }
 
-        [HttpGet("{id}")]
-        [ProducesResponseType(200, Type = typeof(Test))]
-        [ProducesResponseType(400)]
-        public IActionResult GetTestById(int id)
+        [HttpGet("{courseId}/{id}")]
+        public async Task<IActionResult> GetTestById(int courseId, int id)
         {
-            var test = _mapper.Map<TestDto>(_testRepository.GetTestById(id));
+            var testDto = _mapper.Map<TestDto>(await _testRepository.GetTestById(courseId, id));
 
-            try
-            {
-                return Ok(test);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound();
-            }
+            return Ok(testDto);
         }
 
-        [HttpPost]
-        [ProducesResponseType(204, Type = typeof(Test))]
-        [ProducesResponseType(400)]
-        public IActionResult CreateTest([FromBody] TestDto testCreate)
+        [HttpPost("{courseId}")]
+        public IActionResult CreateTest([FromBody] TestDto testDto, int courseId)
         {
-            var testMap = _mapper.Map<Test>(testCreate);
+            var test = _mapper.Map<Test>(testDto);
 
-            _testRepository.CreateTest(testMap);
+            test.CourseId = courseId;
 
-            return Ok("Created Successfully");
+            _testRepository.Create(test);
+
+            return Ok("Succeeded");
         }
 
         [HttpPut]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
-        public IActionResult UpdateTest([FromBody] TestDto updatedTest)
+        public IActionResult UpdateTest([FromBody] TestDto testDto)
         {
-            var testMap = _mapper.Map<Test>(updatedTest);
+            var test = _mapper.Map<Test>(testDto);
 
-            _testRepository.UpdateTest(testMap);
+            _testRepository.Update(test);
 
-            return Ok("Updated Successfully");
+            return Ok("Succeeded");
         }
 
         [HttpDelete("{id}")]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
         public IActionResult DeleteTest(int id)
         {
-            var testToDelete = _testRepository.GetTestById(id);
+            _testRepository.Delete(id);
 
-            _testRepository.DeleteTest(testToDelete);
-
-            return Ok("Deleted Successfully");
+            return Ok("Succeeded");
         }
     }
 }

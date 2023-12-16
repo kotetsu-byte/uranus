@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Uranus.Dto;
-using Uranus.Exceptions;
 using Uranus.Interfaces;
 using Uranus.Models;
 
@@ -9,7 +8,7 @@ namespace Uranus.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DocController : Controller
+    public class DocController : ControllerBase
     {
         private readonly IDocRepository _docRepository;
         private readonly IMapper _mapper;
@@ -20,68 +19,51 @@ namespace Uranus.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
-        [ProducesResponseType(200, Type = typeof(ICollection<Doc>))]
-        public IActionResult GetDocs()
+        [HttpGet("{courseId}/{lessonId}")]
+        public async Task<IActionResult> GetAllDocs(int courseId, int lessonId)
         {
-            var docs = _mapper.Map<List<DocDto>>(_docRepository.GetDocs());
+            var docDtos = _mapper.Map<List<DocDto>>(await _docRepository.GetAllDocs(courseId, lessonId));
 
-            return Ok(docs);
+            return Ok(docDtos);
         }
 
-        [HttpGet("{id}")]
-        [ProducesResponseType(200, Type = typeof(Doc))]
-        [ProducesResponseType(400)]
-        public IActionResult GetDocById(int id)
+        [HttpGet("{courseId}/{lessonId}/{id}")]
+        public async Task<IActionResult> GetDocById(int courseId, int lessonId, int id)
         {
-            var doc = _mapper.Map<DocDto>(_docRepository.GetDocById(id));
-
-            try
-            {
-                return Ok(doc);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound();
-            }
+            var docDto = _mapper.Map<DocDto>(await _docRepository.GetDocById(courseId, lessonId, id));
+            
+            return Ok(docDto);
         }
 
-        [HttpPost]
-        [ProducesResponseType(204, Type = typeof(Test))]
-        [ProducesResponseType(400)]
-        public IActionResult CreateTest([FromBody] DocDto docCreate)
+        [HttpPost("{courseId}/{lessonId}")]
+        public IActionResult CreateTest([FromBody] DocDto docDto, int courseId, int lessonId)
         {
-            var docMap = _mapper.Map<Doc>(docCreate);
+            var doc = _mapper.Map<Doc>(docDto);
 
-            _docRepository.CreateDoc(docMap);
+            doc.CourseId = courseId;
+            doc.LessonId = lessonId;
 
-            return Ok("Created Successfully");
+            _docRepository.Create(doc);
+
+            return Ok("Succeeded");
         }
 
         [HttpPut]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
-        public IActionResult UpdateDoc([FromBody] DocDto updatedDoc)
+        public IActionResult UpdateDoc([FromBody] DocDto docDto)
         {
-            var docMap = _mapper.Map<Doc>(updatedDoc);
+            var doc = _mapper.Map<Doc>(docDto);
 
-            _docRepository.UpdateDoc(docMap);
+            _docRepository.Update(doc);
 
-            return Ok("Updated Successfully");
+            return Ok("Succeeded");
         }
 
         [HttpDelete("{id}")]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
         public IActionResult DeleteDoc(int id)
         {
-            var docToDelete = _docRepository.GetDocById(id);
+            _docRepository.Delete(id);
 
-            _docRepository.DeleteDoc(docToDelete);
-
-            return Ok("Deleted Successfully");
+            return Ok("Succeeded`");
         }
     }
 }

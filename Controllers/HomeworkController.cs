@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Uranus.Dto;
-using Uranus.Exceptions;
 using Uranus.Interfaces;
 using Uranus.Models;
 using Uranus.Repository;
@@ -10,7 +9,7 @@ namespace Uranus.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class HomeworkController : Controller
+    public class HomeworkController : ControllerBase
     {
         private readonly IHomeworkRepository _homeworkRepository;
         private readonly IMapper _mapper;
@@ -21,84 +20,50 @@ namespace Uranus.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<Homework>))]
-        public IActionResult GetHomework()
+        [HttpGet("{courseId}/{lessonId}")]
+        public async Task<IActionResult> GetAllHomeworks(int courseId, int lessonId)
         {
-            var homework = _mapper.Map<List<HomeworkDto>>(_homeworkRepository.GetHomeworks());
+            var homeworkDtos = _mapper.Map<List<HomeworkDto>>(await _homeworkRepository.GetAllHomeworks(courseId, lessonId));
 
-            return Ok(homework);
+            return Ok(homeworkDtos);
         }
 
-        [HttpGet("{id}")]
-        [ProducesResponseType(200, Type = typeof(Homework))]
-        [ProducesResponseType(400)]
-        public IActionResult GetHomeworkById(int id)
+        [HttpGet("{courseId}/{lessonId}/{id}")]
+        public async Task<IActionResult> GetHomeworkById(int courseId, int lessonId, int id)
         {
-            var homework = _mapper.Map<HomeworkDto>(_homeworkRepository.GetHomeworkById(id));
-
-            try
-            {
-                return Ok(homework);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound();
-            }
+            var homeworkDto = _mapper.Map<HomeworkDto>(await _homeworkRepository.GetHomeworkById(courseId, lessonId, id));
+            
+            return Ok(homeworkDto);
         }
 
-        [HttpGet("{id}/materials")]
-        [ProducesResponseType(200, Type = typeof(string[]))]
-        [ProducesResponseType(400)]
-        public IActionResult GetMaterials(int id)
+        [HttpPost("{courseId}/{lessonId}")]
+        public IActionResult CreateLesson([FromBody] HomeworkDto homeworkDto, int courseId, int lessonId)
         {
-            var materials = _mapper.Map<HomeworkDto>(_homeworkRepository.GetMaterials(id));
+            var homework = _mapper.Map<Homework>(homeworkDto);
 
-            try
-            {
-                return Ok(materials);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound();
-            }
-        }
+            homework.CourseId = courseId;
+            homework.LessonId = lessonId;
 
-        [HttpPost]
-        [ProducesResponseType(204, Type = typeof(bool))]
-        [ProducesResponseType(400)]
-        public IActionResult CreateLesson([FromBody] HomeworkDto homeworkCreate)
-        {
-            var homeworkMap = _mapper.Map<Homework>(homeworkCreate);
-
-            _homeworkRepository.CreateHomework(homeworkMap);
-            return Ok("Successfully created");
+            _homeworkRepository.Create(homework);
+            return Ok("Succeeded");
         }
 
         [HttpPut]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
-        public IActionResult UpdateHomework(int homeworkId, [FromBody] Homework updatedHomework)
+        public IActionResult UpdateHomework([FromBody] HomeworkDto homeworkDto)
         {
-            var homeworkMap = _mapper.Map<Homework>(updatedHomework);
+            var homework = _mapper.Map<Homework>(homeworkDto);
 
-            _homeworkRepository.UpdateHomework(homeworkMap);
+            _homeworkRepository.Update(homework);
 
-            return NoContent();
+            return Ok("Succeeded");
         }
 
         [HttpDelete("{id}")]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
         public IActionResult DeleteHomework(int id)
         {
-            var homeworkToDelete = _homeworkRepository.GetHomeworkById(id);
+            _homeworkRepository.Delete(id);
 
-            _homeworkRepository.DeleteHomework(homeworkToDelete);
-
-            return NoContent();
+            return Ok("Succeeded");
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using Uranus.Data;
-using Uranus.Exceptions;
+﻿using Microsoft.EntityFrameworkCore;
+using Uranus.Data;
 using Uranus.Interfaces;
 using Uranus.Models;
 
@@ -14,53 +14,34 @@ namespace Uranus.Repository
             _context = context;
         }
 
-        public ICollection<Test> GetTests()
+        public async Task<ICollection<Test>> GetAllTests(int courseId)
         {
-            return _context.Tests.OrderBy(t => t.Id).ToList();
+            return await _context.Tests.Where(t => t.CourseId == courseId).OrderBy(t => t.Id).ToListAsync();
         }
 
-        public Test GetTestById(int id)
+        public async Task<Test> GetTestById(int courseId, int id)
         {
-            try
-            {
-                return _context.Tests.Where(t => t.Id == id).First();
-            }
-            catch (Exception ex)
-            {
-                throw new NotFoundException();
-            }
+            return await _context.Tests.Where(t => t.CourseId == courseId && t.Id == id).FirstOrDefaultAsync();
         }
 
-        public bool TestExists(int id)
+        public bool Create(Test test)
         {
-            return _context.Tests.Any(t => t.Id == id);
-        }
-
-        public bool CreateTest(Test test)
-        {
-            if (TestExists(test.Id))
-                throw new NotFoundException();
-
             _context.Tests.Add(test);
 
             return Save();
         }
 
-        public bool UpdateTest(Test test)
+        public bool Update(Test test)
         {
-            if (!TestExists(test.Id))
-                throw new NotFoundException();
-
             _context.Tests.Update(test);
 
             return Save();
         }
 
-        public bool DeleteTest(Test test)
+        public bool Delete(int id)
         {
-            if (!TestExists(test.Id))
-                throw new NotFoundException();
-
+            var test = _context.Tests.Where(t => t.Id == id).FirstOrDefault();
+            
             _context.Tests.Remove(test);
 
             return Save();

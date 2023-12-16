@@ -4,14 +4,11 @@ namespace Uranus.Interfaces
 {
     public interface IUserRepository
     {
-        public ICollection<User> GetUsers();
-        public User GetUserById(int id);
-        public User GetUserByUsername(string username);
-        public User GetUserByEmail(string email);
-        public bool UserExists(int id);
-        public bool CreateUser(User user);
-        public bool UpdateUser(User user);
-        public bool DeleteUser(User user);
+        public Task<ICollection<User>> GetAllUsers();
+        public Task<User> GetUserById(int id);
+        public bool Create(User user);
+        public bool Update(User user);
+        public bool Delete(int id);
         public bool Save();
     }
 }

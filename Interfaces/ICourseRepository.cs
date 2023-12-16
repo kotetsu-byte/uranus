@@ -4,14 +4,11 @@ namespace Uranus.Interfaces
 {
     public interface ICourseRepository
     {
-        public ICollection<Course> GetCourses();
-        public Course GetCourseById(int id);
-        public Course GetCourseByName(string courseName);
-        public bool CourseExists(int id);
-        public ICollection<Test> GetTests(int id);
-        public bool CreateCourse(Course course);
-        public bool UpdateCourse(Course course);
-        public bool DeleteCourse(Course course);
+        public Task<ICollection<Course>> GetAllCourses();
+        public Task<Course> GetCourseById(int id);
+        public bool Create(Course course);
+        public bool Update(Course course);
+        public bool Delete(int id);
         public bool Save();
     }
 }

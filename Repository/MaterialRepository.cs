@@ -1,5 +1,5 @@
-﻿using Uranus.Data;
-using Uranus.Exceptions;
+﻿using Microsoft.EntityFrameworkCore;
+using Uranus.Data;
 using Uranus.Interfaces;
 using Uranus.Models;
 
@@ -14,53 +14,34 @@ namespace Uranus.Repository
             _context = context;
         }
 
-        public ICollection<Material> GetMaterials()
+        public async Task<ICollection<Material>> GetAllMaterials(int courseId, int lessonId, int homeworkId)
         {
-            return _context.Materials.OrderBy(m => m.Id).ToList();
+            return await _context.Materials.Where(m => m.CourseId == courseId && m.LessonId == lessonId && m.HomeworkId == homeworkId).OrderBy(m => m.Id).ToListAsync();
         }
 
-        public Material GetMaterialById(int id)
+        public async Task<Material> GetMaterialById(int courseId, int lessonId, int homeworkId, int id)
         {
-            try
-            {
-                return _context.Materials.Where(m => m.Id == id).First();
-            }
-            catch (Exception ex)
-            {
-                throw new NotFoundException();
-            }
+            return await _context.Materials.Where(m => m.CourseId == courseId && m.LessonId == lessonId && m.HomeworkId == homeworkId && m.Id == id).FirstOrDefaultAsync();
         }
 
-        public bool MaterialExists(int id)
+        public bool Create(Material material)
         {
-            return _context.Materials.Any(m => m.Id == id);
-        }
-
-        public bool CreateMaterial(Material material)
-        {
-            if (MaterialExists(material.Id))
-                throw new NotFoundException();
-
             _context.Materials.Add(material);
 
             return Save();
         }
 
-        public bool UpdateMaterial(Material material)
+        public bool Update(Material material)
         {
-            if (!MaterialExists(material.Id))
-                throw new NotFoundException();
-
             _context.Materials.Update(material);
 
             return Save();
         }
 
-        public bool DeleteMaterial(Material material)
+        public bool Delete(int id)
         {
-            if (!MaterialExists(material.Id))
-                throw new NotFoundException();
-
+            var material = _context.Materials.Where(m => m.Id == id).FirstOrDefault();
+            
             _context.Materials.Remove(material);
 
             return Save();

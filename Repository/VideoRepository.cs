@@ -1,5 +1,5 @@
-﻿using Uranus.Data;
-using Uranus.Exceptions;
+﻿using Microsoft.EntityFrameworkCore;
+using Uranus.Data;
 using Uranus.Interfaces;
 using Uranus.Models;
 
@@ -14,53 +14,34 @@ namespace Uranus.Repository
             _context = context;
         }
 
-        public ICollection<Video> GetVideos()
+        public async Task<ICollection<Video>> GetAllVideos(int courseId, int lessonId)
         {
-            return _context.Videos.OrderBy(v => v.Id).ToList();
+            return await _context.Videos.Where(v => v.CourseId == courseId && v.LessonId == lessonId).OrderBy(v => v.Id).ToListAsync();
         }
 
-        public Video GetVideoById(int id)
+        public async Task<Video> GetVideoById(int courseId, int lessonId, int id)
         {
-            try
-            {
-                return _context.Videos.Where(v => v.Id == id).First();
-            }
-            catch (Exception ex)
-            {
-                throw new NotFoundException();
-            }
+            return await _context.Videos.Where(v => v.CourseId == courseId && v.LessonId == lessonId && v.Id == id).FirstOrDefaultAsync();
         }
 
-        public bool VideoExists(int id)
+        public bool Create(Video video)
         {
-            return _context.Videos.Any(v => v.Id == id);
-        }
-
-        public bool CreateVideo(Video video)
-        {
-            if (VideoExists(video.Id))
-                throw new NotFoundException();
-
             _context.Videos.Add(video);
 
             return Save();
         }
 
-        public bool UpdateVideo(Video video)
+        public bool Update(Video video)
         {
-            if (!VideoExists(video.Id))
-                throw new NotFoundException();
-
             _context.Videos.Update(video);
 
             return Save();
         }
 
-        public bool DeleteVideo(Video video)
+        public bool Delete(int id)
         {
-            if (!VideoExists(video.Id))
-                throw new NotFoundException();
-
+            var video = _context.Videos.Where(v => v.Id == id).FirstOrDefault();
+            
             _context.Videos.Remove(video);
 
             return Save();

@@ -1,5 +1,5 @@
-﻿using Uranus.Data;
-using Uranus.Exceptions;
+﻿using Microsoft.EntityFrameworkCore;
+using Uranus.Data;
 using Uranus.Interfaces;
 using Uranus.Models;
 
@@ -14,80 +14,33 @@ namespace Uranus.Repository
             _context = context;
         }
 
-        public ICollection<Course> GetCourses()
+        public async Task<ICollection<Course>> GetAllCourses()
         {
-
-            return _context.Courses.OrderBy(c => c.Id).ToList();
+            return await _context.Courses.OrderBy(c => c.Id).ToListAsync();
         }
 
-        public Course GetCourseById(int id)
+        public async Task<Course> GetCourseById(int id)
         {
-            try
-            {
-                return _context.Courses.Where(c => c.Id == id).First();
-            }
-            catch (Exception ex)
-            {
-                throw new NotFoundException();
-            }
+            return await _context.Courses.Where(c => c.Id == id).FirstOrDefaultAsync();
         }
-
-        public Course GetCourseByName(string name)
+        public bool Create(Course course)
         {
-            try
-            {
-                return _context.Courses.Where(c => c.Name == name).First();
-            }
-            catch (Exception ex)
-            {
-                throw new NotFoundException();
-            }
-        }
-
-        public bool CourseExists(int id)
-        {
-            return _context.Courses.Any(c => c.Id == id);
-        }
-
-        public ICollection<Test> GetTests(int id)
-        {
-            try
-            {
-                var course = _context.Courses.Where(c => c.Id == id).First();
-
-                return course.Tests;
-            }
-            catch (Exception ex)
-            {
-                throw new NotFoundException();
-            }
-        }
-
-        public bool CreateCourse(Course course)
-        {
-            if (CourseExists(course.Id))
-                throw new NotFoundException();
-
             _context.Courses.Add(course);
 
             return Save();
         }
 
-        public bool UpdateCourse(Course course)
+        public bool Update(Course course)
         {
-            if (!CourseExists(course.Id))
-                throw new NotFoundException();
-
             _context.Courses.Update(course);
 
             return Save();
         }
 
-        public bool DeleteCourse(Course course)
+        public bool Delete(int id)
         {
-            if (!CourseExists(course.Id))
-                throw new NotFoundException();
-
+            var course = _context.Courses.Where(c => c.Id == id).FirstOrDefault();
+            
             _context.Courses.Remove(course);
 
             return Save();

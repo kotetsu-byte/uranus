@@ -4,12 +4,11 @@ namespace Uranus.Interfaces
 {
     public interface ITestRepository
     {
-        public ICollection<Test> GetTests();
-        public Test GetTestById(int id);
-        public bool TestExists(int id);
-        public bool CreateTest(Test test);
-        public bool UpdateTest(Test test);
-        public bool DeleteTest(Test test);
+        public Task<ICollection<Test>> GetAllTests(int courseId);
+        public Task<Test> GetTestById(int courseId, int id);
+        public bool Create(Test test);
+        public bool Update(Test test);
+        public bool Delete(int id);
         public bool Save();
     }
 }

@@ -36,7 +36,6 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<ILessonRepository, LessonRepository>();
 builder.Services.AddScoped<IHomeworkRepository, HomeworkRepository>();
-builder.Services.AddScoped<ILoginRepository, LoginRepository>();
 builder.Services.AddScoped<ITestRepository, TestRepository>();
 builder.Services.AddScoped<IVideoRepository, VideoRepository>();
 builder.Services.AddScoped<IDocRepository, DocRepository>();
@@ -82,3 +81,5 @@ app.Map("/login/{username}", (string username) =>
 app.MapControllers();
 
 app.Run();
+// validation
+//

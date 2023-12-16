@@ -4,12 +4,11 @@ namespace Uranus.Interfaces
 {
     public interface IDocRepository
     {
-        public ICollection<Doc> GetDocs();
-        public Doc GetDocById(int id);
-        public bool DocExists(int id);
-        public bool CreateDoc(Doc doc);
-        public bool UpdateDoc(Doc doc);
-        public bool DeleteDoc(Doc doc);
+        public Task<ICollection<Doc>> GetAllDocs(int courseId, int lessonId);
+        public Task<Doc> GetDocById(int courseId, int lessonId, int id);
+        public bool Create(Doc doc);
+        public bool Update(Doc doc);
+        public bool Delete(int id);
         public bool Save();
     }
 }

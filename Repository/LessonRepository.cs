@@ -1,5 +1,5 @@
-﻿using Uranus.Data;
-using Uranus.Exceptions;
+﻿using Microsoft.EntityFrameworkCore;
+using Uranus.Data;
 using Uranus.Interfaces;
 using Uranus.Models;
 
@@ -14,81 +14,34 @@ namespace Uranus.Repository
             _context = context;
         }
 
-        public ICollection<Lesson> GetLessons()
+        public async Task<ICollection<Lesson>> GetAllLessons(int courseId)
         {
-            return _context.Lessons.OrderBy(x => x.Id).ToList();
+            return await _context.Lessons.Where(l => l.CourseId == courseId).OrderBy(x => x.Id).ToListAsync();
         }
 
-        public Lesson GetLessonById(int id)
+        public async Task<Lesson> GetLessonById(int courseId, int id)
         {
-            try
-            {
-                return _context.Lessons.Where(l => l.Id == id).First();
-            }
-            catch (Exception ex)
-            {
-                throw new NotFoundException();
-            }
+            return await _context.Lessons.Where(l => l.CourseId == courseId && l.Id == id).FirstOrDefaultAsync();
         }
 
-        public bool LessonExists(int id)
+        public bool Create(Lesson lesson)
         {
-            return _context.Lessons.Any(l => l.Id == id);
-        }
-
-        public ICollection<Video> GetVideos(int id)
-        {
-            var lesson = _context.Lessons.Where(c => c.Id == id).First();
-
-            try
-            {
-                return lesson.Videos;
-            }
-            catch (Exception ex)
-            {
-                throw new NotFoundException();
-            }
-        }
-
-        public ICollection<Doc> GetDocs(int id)
-        {
-            var lesson = _context.Lessons.Where(c => c.Id == id).First();
-
-            try
-            {
-                return lesson.Docs;
-            }
-            catch (Exception ex)
-            {
-                throw new NotFoundException();
-            }
-        }
-
-        public bool CreateLesson(Lesson lesson)
-        {
-            if (LessonExists(lesson.Id))
-                throw new NotFoundException();
-
             _context.Lessons.Add(lesson);
 
             return Save();
         }
 
-        public bool UpdateLesson(Lesson lesson)
+        public bool Update(Lesson lesson)
         {
-            if (!LessonExists(lesson.Id))
-                throw new NotFoundException();
-
             _context.Lessons.Update(lesson);
 
             return Save();
         }
 
-        public bool DeleteLesson(Lesson lesson)
+        public bool Delete(int id)
         {
-            if (!LessonExists(lesson.Id))
-                throw new NotFoundException();
-
+            var lesson = _context.Lessons.Where(l => l.Id == id).FirstOrDefault();
+            
             _context.Lessons.Remove(lesson);
 
             return Save();
