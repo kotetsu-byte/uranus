@@ -35,8 +35,8 @@ namespace Uranus.Controllers
             return Ok(testDto);
         }
 
-        [HttpPost("{courseId}")]
-        public IActionResult CreateTest([FromBody] TestDto testDto, int courseId)
+        [HttpPost]
+        public IActionResult CreateTest([FromBody] TestPostDto testDto, int courseId)
         {
             var test = _mapper.Map<Test>(testDto);
 
@@ -50,6 +50,9 @@ namespace Uranus.Controllers
         [HttpPut]
         public IActionResult UpdateTest([FromBody] TestDto testDto)
         {
+            if (!_testRepository.Exists((int)testDto.CourseId, (int)testDto.Id))
+                return BadRequest("No such data");
+
             var test = _mapper.Map<Test>(testDto);
 
             _testRepository.Update(test);
@@ -60,6 +63,9 @@ namespace Uranus.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteTest(int id)
         {
+            if (!_testRepository.Exists(id))
+                return BadRequest("No such data");
+
             _testRepository.Delete(id);
 
             return Ok("Succeeded");

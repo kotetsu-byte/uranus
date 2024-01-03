@@ -35,8 +35,8 @@ namespace Uranus.Controllers
             return Ok(videoDto);
         }
 
-        [HttpPost("{courseId}/{lessonId}")]
-        public IActionResult CreateVideo([FromBody] VideoDto videoDto, int courseId, int lessonId)
+        [HttpPost]
+        public IActionResult CreateVideo([FromBody] VideoPostDto videoDto, int courseId, int lessonId)
         {
             var video = _mapper.Map<Video>(videoDto);
 
@@ -51,6 +51,9 @@ namespace Uranus.Controllers
         [HttpPut]
         public IActionResult UpdateVideo([FromBody] VideoDto videoDto)
         {
+            if (!_videoRepository.Exists((int)videoDto.CourseId, (int)videoDto.LessonId, (int)videoDto.Id))
+                return BadRequest("No such data");
+
             var video = _mapper.Map<Video>(videoDto);
 
             _videoRepository.Update(video);
@@ -61,6 +64,9 @@ namespace Uranus.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteVideo(int id)
         {
+            if (!_videoRepository.Exists(id))
+                return BadRequest("No such data");
+
             _videoRepository.Delete(id);
 
             return Ok("Succeeded");

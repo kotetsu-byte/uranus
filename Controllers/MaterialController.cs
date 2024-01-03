@@ -35,14 +35,10 @@ namespace Uranus.Controllers
             return Ok(materialDto);
         }
 
-        [HttpPost("{courseId}/{lessonId}/{homeworkId}")]
-        public IActionResult CreateMaterial([FromBody] MaterialDto materialDto, int courseId, int lessonId, int homeworkId)
+        [HttpPost]
+        public IActionResult CreateMaterial([FromBody] MaterialPostDto materialDto)
         {
             var material = _mapper.Map<Material>(materialDto);
-
-            material.CourseId = courseId;
-            material.LessonId = lessonId;
-            material.HomeworkId = homeworkId;
 
             _materialRepository.Create(material);
 
@@ -52,6 +48,9 @@ namespace Uranus.Controllers
         [HttpPut]
         public IActionResult UpdateMaterial([FromBody] MaterialDto materialDto)
         {
+            if (!_materialRepository.Exists((int)materialDto.CourseId, (int)materialDto.LessonId, (int)materialDto.HomeworkId, (int)materialDto.Id))
+                return BadRequest("No such data");
+
             var material = _mapper.Map<Material>(materialDto);
 
             _materialRepository.Update(material);
@@ -62,6 +61,9 @@ namespace Uranus.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteMaterial(int id)
         {
+            if (!_materialRepository.Exists(id))
+                return BadRequest("No such data");
+
             _materialRepository.Delete(id);
 
             return Ok("Succeeded");

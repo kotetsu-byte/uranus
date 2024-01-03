@@ -24,6 +24,16 @@ namespace Uranus.Repository
             return await _context.Users.Where(p => p.Id == id).FirstOrDefaultAsync();
         }
 
+        public async Task<User> GetUserByUsername(string username)
+        {
+            return await _context.Users.Where(u => u.Username == username).FirstOrDefaultAsync();
+        }
+
+        public bool Exists(int id)
+        {
+            return _context.Users.Any(u => u.Id == id);
+        }
+
         public bool Create(User user)
         {
             _context.Users.Add(user);

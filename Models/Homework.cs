@@ -11,7 +11,7 @@ namespace Uranus.Models
         public string? Description { get; set; }
         public ICollection<Material>? Materials { get; set; }
         public DateOnly? Deadline { get; set; }
-        public bool? IsDone { get; set; }
+        public bool? IsDone { get; set; } = false;
         [ForeignKey("Lesson")]
         public int? LessonId { get; set; }
         public Lesson? Lesson { get; set; }

@@ -2,9 +2,9 @@
 {
     public class LessonDto
     {
-        public int? Id { get; set; }
-        public string? Title { get; set; }
-        public string? Info { get; set; }
-        public int? CourseId { get; set; }
+        public required int? Id { get; set; }
+        public required string? Title { get; set; }
+        public required string? Info { get; set; }
+        public required int? CourseId { get; set; }
     }
 }

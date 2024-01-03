@@ -24,6 +24,16 @@ namespace Uranus.Repository
             return await _context.Docs.Where(d => d.CourseId == courseId && d.LessonId == lessonId && d.Id == id).FirstOrDefaultAsync();
         }
 
+        public bool Exists(int id)
+        {
+            return _context.Docs.Any(d => d.Id == id);
+        }
+
+        public bool Exists(int courseId, int lessonId, int id)
+        {
+            return _context.Docs.Any(d => d.CourseId == courseId && d.LessonId == lessonId && d.Id == id);
+        }
+
         public bool Create(Doc doc)
         {
             _context.Docs.Add(doc);

@@ -36,13 +36,10 @@ namespace Uranus.Controllers
             return Ok(homeworkDto);
         }
 
-        [HttpPost("{courseId}/{lessonId}")]
-        public IActionResult CreateLesson([FromBody] HomeworkDto homeworkDto, int courseId, int lessonId)
+        [HttpPost]
+        public IActionResult CreateLesson([FromBody] HomeworkPostDto homeworkDto)
         {
             var homework = _mapper.Map<Homework>(homeworkDto);
-
-            homework.CourseId = courseId;
-            homework.LessonId = lessonId;
 
             _homeworkRepository.Create(homework);
             return Ok("Succeeded");
@@ -51,6 +48,9 @@ namespace Uranus.Controllers
         [HttpPut]
         public IActionResult UpdateHomework([FromBody] HomeworkDto homeworkDto)
         {
+            if (!_homeworkRepository.Exists((int)homeworkDto.CourseId, (int)homeworkDto.LessonId, (int)homeworkDto.Id))
+                return BadRequest("No such data");
+
             var homework = _mapper.Map<Homework>(homeworkDto);
 
             _homeworkRepository.Update(homework);
@@ -61,6 +61,9 @@ namespace Uranus.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteHomework(int id)
         {
+            if (!_homeworkRepository.Exists(id))
+                return BadRequest("No such data");
+            
             _homeworkRepository.Delete(id);
 
             return Ok("Succeeded");

@@ -37,7 +37,7 @@ namespace Uranus.Controllers
 
         
         [HttpPost]
-        public IActionResult CreateCourse([FromBody] CourseDto courseDto)
+        public IActionResult CreateCourse([FromBody] CoursePostDto courseDto)
         {
             var course = _mapper.Map<Course>(courseDto);
 
@@ -49,6 +49,11 @@ namespace Uranus.Controllers
         [HttpPut]
         public IActionResult UpdateCourse([FromBody] UserDto courseDto)
         {
+            if (!_courseRepository.Exists((int)courseDto.Id))
+            {
+                return BadRequest("No such data");
+            }
+
             var course = _mapper.Map<Course>(courseDto);
 
             _courseRepository.Update(course);
@@ -59,6 +64,11 @@ namespace Uranus.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteCourse(int id)
         {
+            if (!_courseRepository.Exists(id))
+            {
+                return BadRequest("No such data");
+            }
+
             _courseRepository.Delete(id);
 
             return Ok("Succeeded");

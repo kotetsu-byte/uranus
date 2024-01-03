@@ -6,6 +6,8 @@ namespace Uranus.Interfaces
     {
         public Task<ICollection<Material>> GetAllMaterials(int courseId, int lessonId, int homeworkId);
         public Task<Material> GetMaterialById(int courseId, int lessonId, int homeworkId, int id);
+        public bool Exists(int id);
+        public bool Exists(int courseId, int lessonId, int homeworkId, int id);
         public bool Create(Material material);
         public bool Update(Material material);
         public bool Delete(int id);

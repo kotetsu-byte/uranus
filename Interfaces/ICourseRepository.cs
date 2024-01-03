@@ -6,6 +6,7 @@ namespace Uranus.Interfaces
     {
         public Task<ICollection<Course>> GetAllCourses();
         public Task<Course> GetCourseById(int id);
+        public bool Exists(int id);
         public bool Create(Course course);
         public bool Update(Course course);
         public bool Delete(int id);

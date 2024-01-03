@@ -24,6 +24,16 @@ namespace Uranus.Repository
             return await _context.Tests.Where(t => t.CourseId == courseId && t.Id == id).FirstOrDefaultAsync();
         }
 
+        public bool Exists(int id)
+        {
+            return _context.Tests.Any(t => t.Id == id);
+        }
+
+        public bool Exists(int courseId, int id)
+        {
+            return _context.Tests.Any(t => t.CourseId == courseId && t.Id == id);
+        }
+
         public bool Create(Test test)
         {
             _context.Tests.Add(test);

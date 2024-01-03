@@ -2,11 +2,11 @@
 {
     public class MaterialDto
     {
-        public int? Id { get; set; }
-        public string? Title { get; set; }
-        public string? Url { get; set; }
-        public int? HomeworkId { get; set; }
-        public int? LessonId { get; set; }
-        public int? CourseId { get; set; }
+        public required int? Id { get; set; }
+        public required string? Title { get; set; }
+        public required string? Url { get; set; }
+        public required int? HomeworkId { get; set; }
+        public required int? LessonId { get; set; }
+        public required int? CourseId { get; set; }
     }
 }
